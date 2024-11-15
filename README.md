@@ -12,7 +12,7 @@ File list and description:
 - COE_data.csv: carry-over effect dataset for the path analysis
 - EnviornmentalVariables.csv: environmental variables for the MSM-SEM
 
-Details on the data (variable names):
+*Details on the data (variable names):*
 
 EnviornmentalVariables.csv:
 - Kg_C_avail_Ind: kg cockles available per individual (within the 7-km radius around the catching location)
