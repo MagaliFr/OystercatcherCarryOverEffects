@@ -11,13 +11,16 @@ Data
 - ID.csv: individual information of the bird
 - COE_data.csv: carry-over effect dataset for the path analysis
 - EnviornmentalVariables.csv: environmental variables for the MSM-SEM
+
 Code Analysis
 - nimble.R: multi-state mark recapture SEM
 - coe analysis.R: carry-over effect analysis
 - coe env.R: effect of environment on condition
 - Indirect effect: indirect effect of winter environment on reproduction through body condition
+
 Code Figures
 - 
+
 
 output:
 - output1
