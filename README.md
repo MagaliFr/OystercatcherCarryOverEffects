@@ -12,25 +12,22 @@ Data
 - COE_data.csv: carry-over effect dataset for the path analysis
 - EnviornmentalVariables.csv: environmental variables for the MSM-SEM
 
-Code Analysis
+Codes for analyses
 - nimble.R: multi-state mark recapture SEM
 - coe analysis.R: carry-over effect analysis
 - coe env.R: effect of environment on condition
 - Indirect effect: indirect effect of winter environment on reproduction through body condition
 
-
-Code Figures
+Files and codes for figures (if in seperate script)
 fig 3 
 symbols for figures
-
 
 output:
 - output1
 - output 2 hema ref
 
-Global environments on zenodo
+Global environments are archived on zenodo because the file sizes are too big for GitHub.
   
-
 *Details on the data (variable names):*
 
 EnviornmentalVariables.csv:
