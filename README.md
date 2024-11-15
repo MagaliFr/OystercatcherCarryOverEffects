@@ -1,4 +1,4 @@
-Data and code for the manuscript from Frauendorf et al. entitled  xxx
+Data and code for the manuscript from Frauendorf et al. entitled 'Body condition mediates carry-over effects of a deteriorating winter habitat on reproduction in a declining shorebird'. 
 
 Authors:
 Magali Frauendorf, Andrew M. Allen, Henk-Jan van der Kolk, Sarah Cubaynes, Bruno J. Ens, Simon Verhulst, Eelke Jongejans, Hans de Kroon, Kees Oosterbeek, Karin Troost, Martijn van de Pol
