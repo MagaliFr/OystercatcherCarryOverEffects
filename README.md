@@ -3,13 +3,17 @@ Data and code for the manuscript from Frauendorf et al. entitled 'Body condition
 Authors:
 Magali Frauendorf, Andrew M. Allen, Henk-Jan van der Kolk, Sarah Cubaynes, Bruno J. Ens, Simon Verhulst, Eelke Jongejans, Hans de Kroon, Kees Oosterbeek, Karin Troost, Martijn van de Pol
 
-File list and description:
+*File list and description:*
+Data
 - AgeMatrix.csv: age matrix for the MSM-SEM model
 - StateMatrix.csv: state matrix for the MSM-SEM model with condition variables of each individual
 - TCatch.csv: time step that individual was caught
 - ID.csv: individual information of the bird
 - COE_data.csv: carry-over effect dataset for the path analysis
 - EnviornmentalVariables.csv: environmental variables for the MSM-SEM
+Code
+- Indirect effect
+- 
 
 *Details on the data (variable names):*
 
