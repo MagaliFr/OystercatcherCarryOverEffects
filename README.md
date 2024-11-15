@@ -14,6 +14,7 @@ Data
 Code
 - Indirect effect
 - coe env.R
+- nimble.R
 
 *Details on the data (variable names):*
 
