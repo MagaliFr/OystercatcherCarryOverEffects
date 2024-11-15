@@ -28,7 +28,6 @@ EnviornmentalVariables.csv:
 - sumRH_month_2M: precipitation sum (mm/month) (from the nearest weather station) for two month before capture event
 - PrepAnom_month_1M: precipitation anomaly (difference from long-term average) (from the nearest weather station) for one month before capture event
 - PrepAnom_month_2M: precipitation anomaly (difference from long-term average) (from the nearest weather station) for two month before capture event
-
 COE_data.csv:
 - Code: colour ring code of the individual
 - CatchingArea: winter catching area
@@ -53,11 +52,9 @@ COE_data.csv:
 - ChickSurvival: number of days the chick survived
 - NrHatchlings: number of hatchlings
 - NrFledglings: number of fledglings
-  
 AgeMatrix.csv:
 - Age_1final – Age_40final: each time step of the multi-state model. Values indicate: 1=1 year birds, 2=2 and 3 year old birds, 3=adults (>3 years)
 - each row is one individual.
-  
 StateMatrix.csv:
 - SexN: sex of the bird, 1=female, 2=male
 - AgeN: age class, 1=1 year old, 2=2 year old, 3=3 and >3 year old birds
@@ -71,16 +68,12 @@ StateMatrix.csv:
 - HT: handling time (proportion of 24 hours time)
 - DS: day in the season (1=1st November)
 - T1 – T40 indicate the 18 time steps of the multi-state model. Number 1-10 mean the following: 9 alive states: D, P, N, B, V, T, S, R, X (see Fig. 3.2 from PhD thesis and text for explanation), 10 means recovered dead.
-  
 ID.csv:
 - ObsCatchNr: capture event
 - BirdId: ID of the bird
 - Code: colour ring code
-  
 TCatch:
 - TCatch: time step that the individual was caught (in order to apply time variant condition variable in MSM-SEM)
-  
 Note that the ID.csv file can be cbind with the TCatch, StateMatrix and AgeMatrix file, meaning that they have the correct order.
-
 Data collection:
 For details on the data collection, we refer to the manuscript.
