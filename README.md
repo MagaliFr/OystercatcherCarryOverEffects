@@ -1,4 +1,3 @@
-# Oystercatcher carry-over effects
 Data and code for the manuscript from Frauendorf et al. entitled  xxx
 
 Authors:
