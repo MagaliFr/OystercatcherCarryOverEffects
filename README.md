@@ -27,6 +27,8 @@ symbols for figures
 output:
 - output1
 - output 2 hema ref
+
+Global environments on zenodo
   
 
 *Details on the data (variable names):*
