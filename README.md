@@ -14,10 +14,10 @@ Magali Frauendorf, Andrew M. Allen, Henk-Jan van der Kolk, Sarah Cubaynes, Bruno
 - EnviornmentalVariables.csv: environmental variables for the MSM-SEM
 
 ## Codes for analyses
-- nimble.R: multi-state mark recapture SEM
-- coe analysis.R: carry-over effect analysis
-- coe env.R: effect of environment on condition
-- Indirect effect: indirect effect of winter environment on reproduction through body condition
+- M1_9Years_Period12_nimble.R: multi-state mark recapture SEM
+- COE_Analysis.R: carry-over effect analysis
+- COE_Env.R: analysis on effect of environment on condition
+- IndirectEffect_final_final: indirect effect of winter environment on reproduction through body condition
 
 ## Files and codes for figures
 - Figure3.R: seperate script to screate figure 3
