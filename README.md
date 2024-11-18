@@ -28,7 +28,7 @@ Output
 - output: output from the nimble model (mass is used as reference variable)
 - outputHemaRef: output from the nimble model where Hematocrit is used as reference variable
 
-Global environments are archived on zenodo because the file sizes are too big for GitHub.
+Global environments are archived on zenodo (10.5281/zenodo.14179442) because the file sizes are too big for GitHub.
 
   
 *Details on the data (variable names):*
