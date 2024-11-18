@@ -3,7 +3,7 @@ Data and code for the manuscript from Frauendorf et al. entitled 'Body condition
 Authors:
 Magali Frauendorf, Andrew M. Allen, Henk-Jan van der Kolk, Sarah Cubaynes, Bruno J. Ens, Simon Verhulst, Eelke Jongejans, Hans de Kroon, Kees Oosterbeek, Karin Troost, Martijn van de Pol
 
-#File list and description:
+# File list and description:
 
 Data
 - AgeMatrix.csv: age matrix for the MSM-SEM model
@@ -31,7 +31,7 @@ Global environments are archived on zenodo (10.5281/zenodo.14179442) because the
 
 
   
-"Details on the data (variable names):
+# Details on the data (variable names):
 
 EnviornmentalVariables.csv:
 - Kg_C_avail_Ind: kg cockles available per individual (within the 7-km radius around the catching location)
