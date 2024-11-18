@@ -3,9 +3,9 @@ Data and code for the manuscript from Frauendorf et al. entitled 'Body condition
 Authors:
 Magali Frauendorf, Andrew M. Allen, Henk-Jan van der Kolk, Sarah Cubaynes, Bruno J. Ens, Simon Verhulst, Eelke Jongejans, Hans de Kroon, Kees Oosterbeek, Karin Troost, Martijn van de Pol
 
-# File list and description:
+# File list and description
 
-Data
+## Data
 - AgeMatrix.csv: age matrix for the MSM-SEM model
 - StateMatrix.csv: state matrix for the MSM-SEM model with condition variables of each individual
 - TCatch.csv: time step that individual was caught
@@ -13,17 +13,17 @@ Data
 - COE_data.csv: carry-over effect dataset for the path analysis
 - EnviornmentalVariables.csv: environmental variables for the MSM-SEM
 
-Codes for analyses
+## Codes for analyses
 - nimble.R: multi-state mark recapture SEM
 - coe analysis.R: carry-over effect analysis
 - coe env.R: effect of environment on condition
 - Indirect effect: indirect effect of winter environment on reproduction through body condition
 
-Files and codes for figures (if in seperate script)
+## Files and codes for figures (if in seperate script)
 - fig 3: seperate script to screate figure 3
 - symbols for figures: pngs used as images in the figures
 
-Output
+## Output
 - output: output from the nimble model (mass is used as reference variable)
 - outputHemaRef: output from the nimble model where Hematocrit is used as reference variable
 
@@ -31,7 +31,7 @@ Global environments are archived on zenodo (10.5281/zenodo.14179442) because the
 
 
   
-# Details on the data (variable names):
+# Details on the data (variable names)
 
 EnviornmentalVariables.csv:
 - Kg_C_avail_Ind: kg cockles available per individual (within the 7-km radius around the catching location)
