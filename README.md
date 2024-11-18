@@ -24,8 +24,8 @@ Magali Frauendorf, Andrew M. Allen, Henk-Jan van der Kolk, Sarah Cubaynes, Bruno
 - symbols for figures: pngs used as images in the figures
 
 ## Output
-- output: output from the nimble model (mass is used as reference variable)
-- outputHemaRef: output from the nimble model where Hematocrit is used as reference variable
+- output20210805: output from the nimble model (mass is used as reference variable)
+- output20210808_hemaref: output from the nimble model where Hematocrit is used as reference variable
 
 Global environments are archived on zenodo (10.5281/zenodo.14179442) because the file sizes are too big for GitHub.
 
