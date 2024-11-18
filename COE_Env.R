@@ -24,7 +24,7 @@ library(cowplot)
 ################################# ENV ~ COND ###########################################################
 ############################## env dataset ################################################
 memory.limit(size = 350000)    
-env<- read.table("F:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/COE_environment/EnvironmentalVariables.csv", header=T,dec=".", sep=",", fill=T)#food data
+env<- read.table("YOUR_PATH/EnvironmentalVariables.csv", header=T,dec=".", sep=",", fill=T)#food data
 str(env)
 summary(env)
 
@@ -39,9 +39,7 @@ env$sumWS_2M<-as.numeric(env$sumWS_2M)
 str(env)
 
 ########### cond/eta ###########################
-#setwd("N:/Dep.AnE/AnE-share/_Magali/Nimble_M1_P12/Output")
-
-ID<-read.csv(file="F:/NIOO drive/N drive/_Magali/Nimble_M1_P12/StateMatrix2000_2019Cond_3class_9Years_ID.csv")
+ID<-read.csv(file="YOUR_PATH/StateMatrix.csv")
 
 ## add year and state (catching loc) for each individual (based on obscatchNr)
 ID$ObsCatchNr.x<-factor(ID$ObsCatchNr.x)
@@ -130,7 +128,7 @@ ID$State<-ifelse(ID$ObsCatchNr.x=="1", "8", #emma polder
                                                                                                                                                                                                                                                         ifelse(ID$ObsCatchNr.x=="66902259", "7","7")))))))))))))))))))))))))))))))))))
 
 ## import condition/eta 
-eta<-read.csv(file="F:/NIOO drive/N drive/_Magali/Nimble_M1_P12/Output20210805/Output_CR_SEM_nimble_Eta.csv")
+eta<-read.csv(file="YOUR_PATH/Output20210805/Output_CR_SEM_nimble_Eta.csv")
 
 ######## link data frames cond and id
 Cond<-cbind(eta,ID)
@@ -3985,7 +3983,7 @@ samplesList <- runMCMC(Cmcmc,
                        nchains = 2, samplesAsCodaMCMC=TRUE, WAIC=TRUE, summary=F)
 
 library(MCMCvis)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalEffectFoodSampleSize.png", width = 5000, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalEffectFoodSampleSize.png", width = 5000, height = 5000,units = 'px', res = 600)
 MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','beta5', 'beta6'),
          labels = c("Temperature", #expression('Temperature'^2), 
                     "Precipitation", #expression('Precipitation'^2), 
@@ -3997,6 +3995,3 @@ MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','bet
          main="Effect of environmental variables (standardized) on \ncondition (excluding food samples <20 within a buffer)")
 dev.off()
 
-########## conclusion #######
-## removing samples with food were less than 20 samples were taken for the area/loc for cocles and mussels
-  # --> same reults!!! figure also shows that (in supplements)
