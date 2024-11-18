@@ -12,7 +12,7 @@ str(R)
 ### check that if success=1, chicksurvival in days is also at least 30 and not na
 
 #### read condition index 
-ID<-read.csv(file="G:/NIOO drive/N drive/_Magali/Nimble_M1_P12/StateMatrix2000_2019Cond_3class_9Years_ID.csv")
+ID<-read.csv(file="YOUR_PATH/StateMatrix2000_2019Cond_3class_9Years_ID.csv")
 
 ## add year and state (catching loc) for each individual (based on obscatchNr)
 ID$ObsCatchNr.x<-factor(ID$ObsCatchNr.x)
@@ -101,7 +101,7 @@ ID$State<-ifelse(ID$ObsCatchNr.x=="1", "8", #emma polder
                                                                                                                                                                                                                                                         ifelse(ID$ObsCatchNr.x=="66902259", "7","7")))))))))))))))))))))))))))))))))))
 
 ## import condition/eta 
-eta<-read.csv(file="G:/NIOO drive/N drive/_Magali/Nimble_M1_P12/Output20210805/Output_CR_SEM_nimble_Eta.csv")
+eta<-read.csv(file="YOUR_PATH/Output20210805/Output_CR_SEM_nimble_Eta.csv")
 
 ######## link data frames cond and id
 Cond<-cbind(eta,ID)
@@ -114,7 +114,7 @@ df<-join(R, Cond, by = "Code", type = "left", match = "all")
 
 
 ### add the manual calculated condition
-d<-read.csv("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Analysis_Repro/CondManual.csv", header=T, dec=",", sep=";", fill=T)
+d<-read.csv("YOUR_PATH/CondManual.csv", header=T, dec=",", sep=";", fill=T)
 # BRP-YUC7 -0,002021724
 #BRB-B9YU 0,250990583
 #LG-W9RX 0,999224546
@@ -151,9 +151,6 @@ p<-ggplot(df_LD_IC, aes(y=LD_Num, x=IC_Name))+
         title = element_text(size=11))
 p
 
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/PathAnalysis/LayDate_CoastalMainland.png", width = 5000, height = 5000,units = 'px', res = 800)
-p
-dev.off() 
 
 library(dplyr)
 df_LD_IC$LD_Num<-as.numeric(df_LD_IC$LD_Num)
@@ -192,44 +189,6 @@ summary(df$Habitat)
 df$HabitatNew<-factor(df$HabitatNew)
 summary(df$HabitatNew)
 
-############################################################################
-#test<-subset(df, (!is.na(df[,4])))
-
-#write.csv2(test,"P:/CHIRP/Carry-over/Analysis/coe_test.csv", 
-#           row.names =TRUE)
-
-#str(Cond)
-#CondDelta<-subset(Cond, State==1)
-#hist(CondDelta$Mean)
-#sampleDelta<-sample(CondDelta$Mean,4) #1.67 -1.29  2.40  1.09  #
-
-#CondAmeland<-subset(Cond, State==6)
-#hist(CondAmeland$Mean)
-#sampleAmeland<-sample(CondAmeland$Mean,1) #-0.44
-
-#CondBalg<-subset(Cond, State==4)
-#hist(CondBalg$Mean)
-#sampleBalg<-sample(CondBalg$Mean,11) #-0.90 -2.06 -0.81  1.24  0.33  0.75  0.68  1.14 -6.74 -0.75 -0.19
-
-#CondSchier<-subset(Cond, State==7)
-#hist(CondSchier$Mean)
-#sampleSchier<-sample(CondSchier$Mean,14)#0.32 -1.25 -0.09  0.08  1.10 -0.23  1.75  2.34 -2.52 -0.43 -1.04  1.10  3.02 -0.02
-
-
-#CondTerschelling<-subset(Cond, State==6)
-#hist(CondTerschelling$Mean)
-#sampleTerschelling<-sample(CondTerschelling$Mean,2)#-0.78 -0.67
-
-#CondTexel<-subset(Cond, State==6)
-#hist(CondTexel$Mean)
-#sampleTexel<-sample(CondTexel$Mean,2)#-0.21 -0.65
-
-#CondVlieland<-subset(Cond, State==5)
-#hist(CondVlieland$Mean)
-#sampleVlieland<-sample(CondVlieland$Mean,2)#-0.81 -0.61
-
-#d<-read.csv(file="P:/CHIRP/Carry-over/Analysis/coe_test.csv",  header=T, dec=",",sep=";", fill=T)
-
 ##################################################################################################################
 ############################################# bayesian approach ##################################################
 ##################################################################################################################
@@ -250,45 +209,6 @@ d_Coastal<-subset(d,IC=="Coastal")
 d_Coastal$LD_NumN<-((d_Coastal$LD_Num)-mean(d_Coastal$LD_Num, na.rm=T))/(sd(d_Coastal$LD_Num, na.rm=T))
 
 d<-rbind(d_Mainland,d_Coastal)
-
-### standardize laying date across clutch nr (1 and 2)
-#d_Cl1<-subset(d,clutchNr==1)
-#d_Cl1$LD_NumNN<-((d_Cl1$LD_Num)-mean(d_Cl1$LD_Num, na.rm=T))/(sd(d_Cl1$LD_Num, na.rm=T))
-
-#d_Cl2<-subset(d,clutchNr==2)
-#d_Cl2$LD_NumNN<-((d_Cl2$LD_Num)-mean(d_Cl2$LD_Num, na.rm=T))/(sd(d_Cl2$LD_Num, na.rm=T))
-
-#d<-rbind(d_Cl1,d_Cl2)
-
-######### not working better, much less variation then ###############
-### across habitat and island/mainland
-#d_ICr<-subset(d,IC=="Coastal"& Habitat=="Cropfield")
-#d_ICr$LD_NumN<-((d_ICr$LD_Num)-mean(d_ICr$LD_Num, na.rm=T))/(sd(d_ICr$LD_Num, na.rm=T))
-
-#d_IG<-subset(d,IC=="Coastal"& Habitat=="Grassland")
-#d_IG$LD_NumN<-((d_IG$LD_Num)-mean(d_IG$LD_Num, na.rm=T))/(sd(d_IG$LD_Num, na.rm=T))
-
-#d_IN<-subset(d,IC=="Coastal"& Habitat=="Nature")
-#d_IN$LD_NumN<-((d_IN$LD_Num)-mean(d_IN$LD_Num, na.rm=T))/(sd(d_IN$LD_Num, na.rm=T))
-
-#d_IS<-subset(d,IC=="Coastal"& Habitat=="Saltmarsh")
-#d_IS$LD_NumN<-((d_IS$LD_Num)-mean(d_IS$LD_Num, na.rm=T))/(sd(d_IS$LD_Num, na.rm=T))
-
-#d_MC<-subset(d,IC=="Mainland"& Habitat=="Cropfield" & Habitat=="Dune")
-#d_MC$LD_NumN<-((d_MC$LD_Num)-mean(d_MC$LD_Num, na.rm=T))/(sd(d_MC$LD_Num, na.rm=T))
-
-#d_MG<-subset(d,IC=="Mainland"& Habitat=="Grassland")
-#d_MG$LD_NumN<-((d_MG$LD_Num)-mean(d_MG$LD_Num, na.rm=T))/(sd(d_MG$LD_Num, na.rm=T))
-
-#d_MN<-subset(d,IC=="Mainland"& Habitat=="Nature")
-#d_MN$LD_NumN<-((d_MN$LD_Num)-mean(d_MN$LD_Num, na.rm=T))/(sd(d_MN$LD_Num, na.rm=T))
-
-#d_MU<-subset(d,IC=="Mainland"& Habitat=="Urban")
-#d_MU$LD_NumN<-((d_MU$LD_Num)-mean(d_MU$LD_Num, na.rm=T))/(sd(d_MU$LD_Num, na.rm=T))
-
-#d<-rbind(d_ICr,d_IG,d_IN,d_IS,d_MC,d_MG,d_MN,d_MU)
-#hist(d$LD_NumN)
-#hist(d$LD_Num)
 
 #########################################################################################
 ### daily chick survival
