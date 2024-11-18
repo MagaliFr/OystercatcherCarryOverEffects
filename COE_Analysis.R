@@ -12,7 +12,7 @@ str(R)
 ### check that if success=1, chicksurvival in days is also at least 30 and not na
 
 #### read condition index 
-ID<-read.csv(file="YOUR_PATH/StateMatrix2000_2019Cond_3class_9Years_ID.csv")
+ID<-read.csv(file="YOUR_PATH/StateMatrix.csv")
 
 ## add year and state (catching loc) for each individual (based on obscatchNr)
 ID$ObsCatchNr.x<-factor(ID$ObsCatchNr.x)
@@ -295,7 +295,7 @@ p3<-ggplot(d_Surv, aes(y=ChickSurvival, x=HabitatNew))+
 p3
 
 library(patchwork)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/PathAnalysis/ChickSurv_Habitat.png", width = 12000, height = 4000,units = 'px', res = 800)
+png("YOUR_PATH/ChickSurv_Habitat.png", width = 12000, height = 4000,units = 'px', res = 800)
 p2+p3+p1
 dev.off() 
 
@@ -384,56 +384,6 @@ pd_Ch_CondLD_2<-chick_fit_brms[["fit"]]@sim[["samples"]][[2]][["b_LDNumN_MeanStd
 pd_Ch_CondLD<-c(pd_Ch_CondLD_1,pd_Ch_CondLD_2)
 round(mean(pd_Ch_CondLD_1>0),2) #0.95
 
-######### same without lay date for synthesis #################
-library(lme4)
-m_with<-glm(ChickSurvival_poisson ~ MeanStd+LD_NumN+Cr,data=d_Surv, family=poisson) #LD_NumN
-m_without<-glm(ChickSurvival_poisson ~ MeanStd,data=d_Surv, family=poisson) 
-m_null<-glm(ChickSurvival_poisson ~ MeanStd + Cr ,data=d_Surv, family=poisson) 
-
-m2<-glmer(ChickSurvival_poisson ~ MeanStd+(1|Cr),data=d_Surv, family=poisson) #LD_NumN
-
-summary(m_with)
-summary(m_without)
-library(piecewiseSEM)
-rsquared(m2)
-
-## full model with lay date
-summary(m_with)
-#1 - (Residual Deviance/Null Deviance)
-1 - (119.96/226.95) #47
-
-## full model without lay date
-m_without<-glm(ChickSurvival_poisson ~ MeanStd+Cr,data=d_Surv, family=poisson) #LD_NumN
-summary(m_without)
-#1 - (Residual Deviance/Null Deviance)
-1 - (123.7/226.95) #45
-
-## removed cr =habitat effect because explained a lot in variation and also nly as random effect included in the other models
-summary(m1)
-library(MuMIn)
-r.squaredGLMM(m_with)
-
-library(AICcmodavg)
-aictab(list(m1), c("m1"))
-
-library(r2glmm)
-(r2.m1 = r2beta(m_with, method = 'kr', partial = T))
-
-library(rsq)
-rsq.partial(m_with)
-rsq(m_with)
-
-remotes::install_github("mastoffel/partR2") 
-library(partR2)
-R2_BMa <- partR2(m_with, partvars = c("MeanStd", "LD_NumN"), 
-                 R2_type = "marginal", nboot = 10)
-R2_BMa
-#> 
-
-m3<-glmer(ChickSurvival_poisson ~ MeanStd+(1|Cr),data=d_Surv, family=poisson) #LD_NumN
-library(MuMIn)
-r.squaredGLMM(m3)
-rsq(m3)
 
 #####################################################################
 ########### plot convergence #########################################
@@ -466,7 +416,7 @@ con_13<-mcmc_trace(chick_fit_brms, pars=c("sigma_LDNumN")) +#pars = c("wt", "sig
   labs(tag="l)", title="sigma lay date", y="")
 
 library(patchwork)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/PathAnalysisConvergence/ConvergenceChickSucces.png", width = 9000, height = 12000,units = 'px', res = 800)
+png("YOUR_PATH/ConvergenceChickSucces.png", width = 9000, height = 12000,units = 'px', res = 800)
 (con_1|con_8)/(con_2|con_9)/(con_3|con_10)/(con_4|con_11)/(con_5|con_12)/(con_6|con_13)
 dev.off() 
 
@@ -492,7 +442,7 @@ CS_table
 knitr::kable(CS_table,digits=2, format="pandoc")
 kable_out_CS_table <- knitr::kable(CS_table, "html", digits=4) %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
 kable_out_CS_table
-readr::write_file(kable_out_CS_table, "P:/CHIRP/Carry-over/Analysis/Figures/Supplements/PathAnalysisConvergence/CS_table.doc")
+readr::write_file(kable_out_CS_table, "YOUR_PATH/CS_table.doc")
 
 ##################################################################################################################
 # -------------------------------------- plot chick survival ----------------------------------------------------
@@ -501,8 +451,6 @@ readr::write_file(kable_out_CS_table, "P:/CHIRP/Carry-over/Analysis/Figures/Supp
 LDNumN_Intercept<-c(chick_fit_brms$fit@sim$samples[[1]]$b_LDNumN_Intercept,chick_fit_brms$fit@sim$samples[[2]]$b_LDNumN_Intercept)
 LDNumN_Mean<-c(chick_fit_brms$fit@sim$samples[[1]]$b_LDNumN_MeanStd,chick_fit_brms$fit@sim$samples[[2]]$b_LDNumN_MeanStd)
 LDNumN_Cr<-c(chick_fit_brms$fit@sim$samples[[1]]$b_LDNumN_Cr,chick_fit_brms$fit@sim$samples[[2]]$b_LDNumN_Cr)
-#chick_mod <- bf(ChickSurvival_poisson ~ MeanStd+LD_NumN+Cr, family = "poisson") #DCS_2
-#LD_mod <- bf(LD_NumN ~ MeanStd+Cr, family="gaussian")
 
 mean.Cr = mean(d_Surv$Cr) # mean laying date
 mean.mat.Cr = matrix(rep(mean.Cr,nrow(d_Surv)),ncol=1) # matrix of mean laying date
@@ -539,12 +487,10 @@ df1$CondMean<-c(-2.1, -1.5, -0.9, -0.3,  0.3  ,0.9  ,1.5  ,2.0)
 library(ggplot2)
 p_LD<-ggplot(dfLD, aes(x = cond, y = LD)) + 
   geom_point(df1,mapping=aes(x=CondMean,y=mean, size=n),cex=6, alpha=0.5, col="#0072B2")+ #stcov for standardized
-  #geom_point(mapping=aes(x=d_Surv[,21],y=d_Surv[,2]), alpha=0.5, col="#0072B2", cex=6)+ #stcov for standardized
   geom_line(data=dfLD,mapping=aes(x = cond, y = LD), col="#0072B2",cex=4, lty="dashed") + 
   geom_ribbon(data=dfLD,aes(ymin = lciLD, ymax = uciLD), fill="#0072B2",alpha = 0.25)+
   labs(x = "body condition (standardized)", y = "laying date (standardized)")+
   theme_bw()+
-  #ylim(-1.32,1.05)+
   scale_y_continuous(position = "right")+
   theme(legend.position="none", 
         legend.title = element_text(size = 17),
@@ -552,10 +498,6 @@ p_LD<-ggplot(dfLD, aes(x = cond, y = LD)) +
         text = element_text(size=40),
         axis.title=element_text(size=40))
         #axis.title.y=element_blank())
-  #annotation_custom(rasterGrob(imgGras, 
-  #                             width = unit(1.5,"npc"),
-  #                             height = unit(1.5,"npc")), 
-  #                  0.146,0.172, .82, 1.1)
 p_LD
 
 # plot with residuals
@@ -576,18 +518,12 @@ p_LD<-ggplot(dfLD, aes(x = cond, y = LD)) +
   geom_ribbon(data=dfLD,aes(ymin = lciLD, ymax = uciLD), fill="#0072B2",alpha = 0.25)+
   labs(x = "body condition (standardized)", y = "laying date (standardized)")+
   theme_bw()+
-  #ylim(-1.32,1.05)+
   scale_y_continuous(position = "right")+
   theme(legend.position="none", 
         legend.title = element_text(size = 17),
         legend.text = element_text(size = 16),
         text = element_text(size=40),
         axis.title=element_text(size=40))
-#axis.title.y=element_blank())
-#annotation_custom(rasterGrob(imgGras, 
-#                             width = unit(1.5,"npc"),
-#                             height = unit(1.5,"npc")), 
-#                  0.146,0.172, .82, 1.1)
 p_LD
 
 ## plot with residuals and bins
@@ -611,7 +547,6 @@ p_LD<-ggplot(dfLD, aes(x = cond, y = LD)) +
   geom_ribbon(data=dfLD,aes(ymin = lciLD, ymax = uciLD), fill="#0072B2",alpha = 0.25)+
   labs(x = "body condition (s.d.)", y = "laying date (s.d.)")+
   theme_bw()+
-  #ylim(-1.32,1.05)+
   scale_y_continuous(position = "right")+
   theme(legend.position="none", 
         legend.title = element_text(size = 17),
@@ -622,9 +557,6 @@ p_LD
 
 ################################################################################
 ### plot effect of condition on chick surv
-#chick_mod <- bf(ChickSurvival_poisson ~ MeanStd+LD_NumN+Cr, family = "poisson") #DCS_2
-#LD_mod <- bf(LD_NumN ~ MeanStd+Cr, family="gaussian")
-
 # extract estimates per iteration
 DCS_Intercept<-c(chick_fit_brms$fit@sim$samples[[1]]$b_ChickSurvivalpoisson_Intercept,chick_fit_brms$fit@sim$samples[[2]]$b_ChickSurvivalpoisson_Intercept)
 DCS_Mean<-c(chick_fit_brms$fit@sim$samples[[1]]$b_ChickSurvivalpoisson_MeanStd,chick_fit_brms$fit@sim$samples[[2]]$b_ChickSurvivalpoisson_MeanStd)
@@ -676,18 +608,12 @@ p_DCS<-ggplot(dfDCS, aes(x = cond, y = DCS)) +
   geom_ribbon(data=dfDCS,aes(ymin = lciDCS, ymax = uciDCS), fill="#0072B2",alpha = 0.25)+
   labs(x = "body condition (standardized)", y = "chick survival (days)")+
   theme_bw()+
-  #ylim(-1.32,1.05)+
   scale_y_continuous(position = "right")+
   theme(legend.position="none", 
         legend.title = element_text(size = 17),
         legend.text = element_text(size = 16),
         text = element_text(size=40),
         axis.title=element_text(size=40))
-#axis.title.y=element_blank())
-#annotation_custom(rasterGrob(imgGras, 
-#                             width = unit(1.5,"npc"),
-#                             height = unit(1.5,"npc")), 
-#                  0.146,0.172, .82, 1.1)
 p_DCS
 
 # plot with residuals
@@ -698,26 +624,17 @@ p_DCS<-ggplot(dfDCS, aes(x = cond, y = DCS)) +
   geom_ribbon(data=dfDCS,aes(ymin = lciDCS, ymax = uciDCS), fill="#0072B2",alpha = 0.25)+
   labs(x = "body condition (standardized)", y = "chick survival (days)")+
   theme_bw()+
-  #ylim(-1.32,1.05)+
   scale_y_continuous(position = "right")+
   theme(legend.position="none", 
         legend.title = element_text(size = 17),
         legend.text = element_text(size = 16),
         text = element_text(size=40),
         axis.title=element_text(size=40))
-#axis.title.y=element_blank())
-#annotation_custom(rasterGrob(imgGras, 
-#                             width = unit(1.5,"npc"),
-#                             height = unit(1.5,"npc")), 
-#                  0.146,0.172, .82, 1.1)
 p_DCS
 
 
 #residuals and bins
-#b <- seq(-2.25,2.25,0.5) #2.4, 0.6
 b <- seq(-2.3,2.3,0.3) #2.4, 0.6
-
-#test$EW_Bin<-cut(test$EW_Imp,breaks=b)
 d_Surv_chick$Cond_Bin<-cut(d_Surv_chick$MeanStd,breaks=b)
 summary(d_Surv_chick$Cond_Bin)
 df2<-d_Surv_chick %>%
@@ -725,12 +642,6 @@ df2<-d_Surv_chick %>%
   dplyr::summarise(mean = mean(Estimate.ChickSurvivalpoisson , na.rm=T), n = n())
 df2
 df2<-data.frame(df2)
-#df2$CondMean<-seq(-2.0,2.0,0.5)
-#df2$CondMean<-seq(-1.9,2.3,0.6)
-#df2$CondMean<-seq(-2.15,2.15,0.3)
-#df2$CondMean<-c(-2.1,-1.3,-1.1, -0.9,-0.7,-0.5, -0.3, -0.1, 0.1,0.5,0.7,0.9,1.3,1.5,2.1)
-#df2$CondMean<-c(-2.0,-1.2, -0.8,-0.4, 0, 0.4,0.8,1.2,1.6,2.0)
-#df2$CondMean<-c(-2.0,-1, -0.5,0, 0.5,1,1.5,2.0)
 df2$CondMean<-c(-2.15,-1.25, -0.95, -0.65, -0.35, -0.05,0.25, 0.55,0.85, 1.15,1.45,2.05)
 
 p_DCS<-ggplot(dfDCS, aes(x = cond, y = DCS)) + 
@@ -741,41 +652,13 @@ p_DCS<-ggplot(dfDCS, aes(x = cond, y = DCS)) +
   #geom_point(d_Surv_chick,mapping=aes(x=MeanStd,y=Estimate.ChickSurvivalpoisson), cex=6, alpha=0.5, col="#0072B2")+ #stcov for standardized
   labs(x = "body condition (standardized)", y = "chick survival (days)")+
   theme_bw()+
-  #ylim(-1.32,1.05)+
   scale_y_continuous(position = "right")+
   theme(legend.position="none", 
         legend.title = element_text(size = 17),
         legend.text = element_text(size = 16),
         text = element_text(size=40),
         axis.title=element_text(size=40))
-#axis.title.y=element_blank())
-#annotation_custom(rasterGrob(imgGras, 
-#                             width = unit(1.5,"npc"),
-#                             height = unit(1.5,"npc")), 
-#                  0.146,0.172, .82, 1.1)
 p_DCS
-
-#another way of plotting
-# Calculate marginal effects
-library(effects)
-summary(chick_fit_brms)
-# Calculate marginal effects
-marginal_effects <- margins(chick_fit_brms)
-
-# Plot partial residuals for the Poisson component of ChickSurvival_poisson
-plot(marginal_effects, component = "ChickSurvivalpoisson:MeanStd", main = "Partial Residual Plot for ChickSurvival (Poisson)")
-
-# Calculate marginal effects
-marginal_effects <- as.data.frame(margins(chick_fit_brms))
-
-# Plot partial residuals for the Poisson component of ChickSurvival_poisson
-plot(marginal_effects$MeanStd, marginal_effects$ChickSurvivalpoisson, type = "l", 
-     main = "Partial Residual Plot for ChickSurvival (Poisson)", 
-     xlab = "MeanStd", ylab = "Partial Residuals")
-
-# Add observed data points
-points(your_data$MeanStd, your_data$ChickSurvival_poisson, col = "red", pch = 16)
-
 
 ### plot effect of laying date on chick surv
 # extract estimates per iteration
@@ -825,18 +708,12 @@ p_DCS_LD<-ggplot(dfDCS_LD, aes(x = LD, y = DCS)) +
   geom_ribbon(data=dfDCS_LD,aes(ymin = lciDCS_LD, ymax = uciDCS_LD), alpha = 0.25, fill="#0072B2")+
   labs(x = "laying date", y = "chick survival (days)")+
   theme_bw()+
-  #ylim(-1.32,1.05)+
   scale_y_continuous(position = "right")+
   theme(legend.position="none", 
         legend.title = element_text(size = 17),
         legend.text = element_text(size = 16),
         text = element_text(size=40),
         axis.title=element_text(size=40))
-#axis.title.y=element_blank())
-#annotation_custom(rasterGrob(imgGras, 
-#                             width = unit(1.5,"npc"),
-#                             height = unit(1.5,"npc")), 
-#                  0.146,0.172, .82, 1.1)
 p_DCS_LD
 
 #RESIDUALS AND BINS
@@ -857,18 +734,12 @@ p_DCS_LD<-ggplot(dfDCS_LD, aes(x = LD, y = DCS)) +
   geom_ribbon(data=dfDCS_LD,aes(ymin = lciDCS_LD, ymax = uciDCS_LD), alpha = 0.25, fill="#0072B2")+
   labs(x = "laying date", y = "chick survival (days)")+
   theme_bw()+
-  #ylim(-1.32,1.05)+
   scale_y_continuous(position = "right")+
   theme(legend.position="none", 
         legend.title = element_text(size = 17),
         legend.text = element_text(size = 16),
         text = element_text(size=40),
         axis.title=element_text(size=40))
-#axis.title.y=element_blank())
-#annotation_custom(rasterGrob(imgGras, 
-#                             width = unit(1.5,"npc"),
-#                             height = unit(1.5,"npc")), 
-#                  0.146,0.172, .82, 1.1)
 p_DCS_LD
 
 ####################################################################################################################
@@ -955,7 +826,7 @@ p6<-ggplot(NS, aes(y=DNS_2, x=HabitatNew))+
 p6
 
 library(patchwork)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/PathAnalysis/NestSurv_Habitat.png", width = 12000, height = 4000,units = 'px', res = 800)
+png("YOUR_PATH/NestSurv_Habitat.png", width = 12000, height = 4000,units = 'px', res = 800)
 p5+p6+p4
 dev.off() 
 #############
@@ -1008,8 +879,6 @@ Estimate  Est.Error         Q2.5     Q97.5
 R2DNS2    0.08869987 0.05997597 8.164721e-03 0.2361690
 R2LDNumN1 0.04306444 0.05080465 6.463582e-05 0.1828242
 
-?bayes_R2
-
 #######
 ##probability of direction:
 ## cond on surv
@@ -1033,36 +902,6 @@ r.squaredGLMM(nest_fit_brms)
 #R2m       R2c
 #theoretical 0.21582417 0.5708809
 #delta       0.06817415 0.1803288
-
-######### same without lay date for synthesis #################
-library(betareg)
-dat.betareg <- betareg(DNS_2 ~ MeanStd+LD_NumN_1, data = NS) ## frequentist approach beta distribution, with lay date first
-summary(dat.betareg) 
-dat.betareg1 <- betareg(DNS_2 ~ MeanStd, data = NS)  #same without lay date
-summary(dat.betareg1)
-r.squaredGLMM(dat.betareg1) ##does not work
-summary(dat.betareg1)$pseudo.r.squared #
-
-summary(dat.betareg1)$pseudo.r.squared #14
-summary(dat.betareg)$pseudo.r.squared #40
-
-library(AICcmodavg)
-aictab(list(dat.betareg1), c("dat.betareg1"))
-
-m2<-glm(DNS_2 ~ MeanStd+LD_NumN_1,data=NS, family=binomial) 
-summary(m2) #with binomial model not sig
-library(MuMIn)
-r.squaredGLMM(m2)
-
-library(r2glmm)
-(r2.m1 = r2beta(dat.betareg, method = 'kr', partial = T))
-
-
-library(rsq)
-rsq.partial(dat.betareg) #only works with glm
-
-library(AICcmodavg)
-aictab(list(m2), c("m2"))
 
 #####################################################################
 ########### plot convergence #########################################
@@ -1158,8 +997,6 @@ dfLD_NS <- data.frame(cond = NS[,12][ord], #stcov for standardized
                    uciLD_NS = uciLD_NS[ord])
 head(dfLD_NS)
 
-
-
 library(radiant.data)
 library(dplyr)
 head(NS)
@@ -1254,18 +1091,11 @@ p_DNS<-ggplot(dfDNS, aes(x = cond, y = DNS)) +
   geom_ribbon(data=dfDNS,aes(ymin = lciDNS, ymax = uciDNS), fill="#E69F00",alpha = 0.25)+
   labs(x = "body condition (standardized)", y = "daily nest survival probability")+
   theme_bw()+
-  #labs(tag=c("a)"))+
-  #ylim(-1.32,1.05)+
   theme(legend.position="none", 
         legend.title = element_text(size = 17),
         legend.text = element_text(size = 16),
         text = element_text(size=40),
         axis.title=element_text(size=40))
-#axis.title.y=element_blank())
-#annotation_custom(rasterGrob(imgGras, 
-#                             width = unit(1.5,"npc"),
-#                             height = unit(1.5,"npc")), 
-#                  0.146,0.172, .82, 1.1)
 p_DNS
 
 ### plot effect of laying date on chick surv
@@ -1314,17 +1144,11 @@ p_DNS_LD<-ggplot(dfDNS_LD, aes(x = LD, y = DNS)) +
   geom_ribbon(data=dfDNS_LD,aes(ymin = lciDNS_LD, ymax = uciDNS_LD),fill="#E69F00", alpha = 0.25)+
   labs(x = "laying date", y = "daily nest survival")+
   theme_bw()+
-  #ylim(-1.32,1.05)+
   theme(legend.position="none", 
         legend.title = element_text(size = 17),
         legend.text = element_text(size = 16),
         text = element_text(size=40),
         axis.title=element_text(size=40))
-#axis.title.y=element_blank())
-#annotation_custom(rasterGrob(imgGras, 
-#                             width = unit(1.5,"npc"),
-#                             height = unit(1.5,"npc")), 
-#                  0.146,0.172, .82, 1.1)
 p_DNS_LD
 
 ##############################################################################################
@@ -1394,10 +1218,7 @@ p_DNCS_LD<-ggplot(dfDNS_LD, aes(x = LD, y = DNS)) +
   labs(x = "lay date (standardized)", y = "daily nest survival probability", tag="a)")+
   scale_y_continuous(name = "daily nest survival probability", 
                      sec.axis = sec_axis(~.*40, name = "chick survival (days)"), limits=c(0,1.05))+ 
-                     #breaks=c(0,0.1,0.2,0.3,0.4, 0.5))+
-  #ylim(0.5,1)+
   theme_bw()+
-  #ylim(-1.32,1.05)+
   theme(legend.position="none", 
         legend.title = element_text(size = 19),
         legend.text = element_text(size = 18),
@@ -1408,30 +1229,6 @@ p_DNCS_LD<-ggplot(dfDNS_LD, aes(x = LD, y = DNS)) +
   scale_color_manual(values = colors, name="daily surivival of")+
   scale_shape_manual(name = "daily surivival of", values = shapes)
 p_DNCS_LD
-
-# daily surv and condition
-#p_DNCS<-ggplot(dfDNS, aes(x = cond, y = DNS)) + 
-#  geom_point(dfDNS,mapping=aes(x=NS[,2],y=NS[,1], color="nest", shape="nest"), cex=6,alpha=0.5)+ #stcov for standardized
-#  geom_point(dfDCS,mapping=aes(x=d_Surv[,1],y=d_Surv[,8], colour="chick", shape="chick"),cex=6, alpha=0.5)+ #stcov for standardized
-#  
-#  geom_line(data=dfDNS,mapping=aes(x = cond, y = DNS, color="nest"), cex=4, linetype="dashed") + 
-#  geom_line(data=dfDCS,mapping=aes(x = cond, y = DCS, color="chick"), cex=4) + 
-#  
-#  geom_ribbon(data=dfDNS,aes(ymin = lciDNS, ymax = uciDNS, x=cond, y=DNS), fill="#E69F00",alpha = 0.25)+
-#  geom_ribbon(data=dfDCS,aes(ymin = lciDCS, ymax = uciDCS, x=cond, y=DCS), fill="#0072B2", alpha = 0.25)+
-#  
-#  labs(x = "body condition", y = "daily nest survival probability", tag="c)")+
-#  #scale_y_continuous(name = "daily nest survival probability", 
-#  #                   sec.axis = sec_axis(~.*40, name = "chick survival (days)"))+
-#  theme_bw()+
-#  theme(legend.position="none", 
-#        legend.title = element_text(size = 17),
-#        legend.text = element_text(size = 16),
-#        text = element_text(size=35),
-#        axis.title.y.right=element_text(size=35))+
-#  scale_color_manual(values = colors)+
-#  scale_shape_manual(values = shapes)
-#p_DNCS
 
 p_DNCS<-ggplot(dfDNS, aes(x = cond, y = DNS)) + 
   geom_point(dfDNS,mapping=aes(x=NS[,12],y=NS[,1], color="nest", shape="nest"), cex=6,alpha=0.5)+ #stcov for standardized
@@ -1479,8 +1276,6 @@ p_LD_cond<-ggplot(dfLD_NS, aes(x = cond, y = LD)) +
   scale_shape_manual(values = shapes)
 p_LD_cond
 
-
-
 #########################################  combine plots ###########
 #libraries
 library(gridExtra)
@@ -1508,8 +1303,7 @@ bottom = richtext_grob(
   text = 'body condition (s.d.)', gp=gpar(fontsize=30))
 
 
-png("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig4/DNCS_cond.png", width = 7500, height = 5000,units = 'px', res = 600)
-#png("P:/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig5/DNCS_cond_noPoints.png", width = 7500, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/DNCS_cond.png", width = 7500, height = 5000,units = 'px', res = 600)
 
 p_a <- grid.arrange(grobs=p, ncol = 2, nrow = 1, 
                     right = yright, left = yleft, bottom = bottom)
@@ -1530,8 +1324,7 @@ yleft = richtext_grob("lay date (standardized)", rot=90, gp=gpar(fontsize=30))
 bottom = richtext_grob(
   text = 'body condition (s.d.)', gp=gpar(fontsize=30))
 
-png("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig4/LD_cond.png", width = 7500, height = 5000,units = 'px', res = 600)
-#png("P:/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig5/LD_cond_noPoints.png", width = 7500, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/LD_cond.png", width = 7500, height = 5000,units = 'px', res = 600)
 
 p_b <- grid.arrange(grobs=ppp, ncol = 2, nrow = 1, 
                     right = yright, left = yleft, bottom = bottom)
@@ -1555,8 +1348,7 @@ yleft = richtext_grob("daily clutch survival probability", rot=90, gp=gpar(fonts
 bottom = richtext_grob(
   text = 'lay date (standardized)', gp=gpar(fontsize=30))
 
-png("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig4/DNCS_LD.png", width = 7500, height = 5000,units = 'px', res = 600)
-#png("P:/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig5/DNCS_LD_noPoints.png", width = 7500, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/DNCS_LD.png", width = 7500, height = 5000,units = 'px', res = 600)
 
 p_c <- grid.arrange(grobs=pp, ncol = 2, nrow = 1, 
                     right = yright, left = yleft, bottom = bottom)
@@ -1565,13 +1357,9 @@ grid.text("c)", x=0.02,y=0.96,
 dev.off() 
 
 
-png("F:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig4/Legend.png", width = 8500, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/Legend.png", width = 8500, height = 5000,units = 'px', res = 600)
 p_leg
 dev.off() 
-
-#patchwork <- (p_LD_NS/p_DNS_LD/p_DNS)|(p_LD/p_DCS_LD/p_DCS)
-#patchwork<-patchwork +  plot_layout(guide='collect') & theme(legend.position = 'bottom')
-#patchwork+plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 18))
 
 ############################################################################################################
 #################################### FOR SUPPLEMENTS ######################################################
@@ -1672,7 +1460,7 @@ p_CS_Cr <- ggplot() +
 p_CS_Cr
 
 
-png("F:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/Supplements/PathAnalysis/CropHatchling.png", width = 7500, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/CropHatchling.png", width = 7500, height = 5000,units = 'px', res = 600)
 p_CS_Cr
 dev.off() 
 
@@ -1733,554 +1521,9 @@ p_LD_Cr <- ggplot() +
 p_LD_Cr
 
 
-png("F:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/Supplements/PathAnalysis/CropLD.png", width = 7500, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/CropLD.png", width = 7500, height = 5000,units = 'px', res = 600)
 p_LD_Cr
 dev.off() 
 
 
-###############################################################################################################################################
-###############################################################################################################################################
-###############################################################################################################################################
 
-save.image("F:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig4/GlobalEnvFig4.Rdata")
-
-###############################################################################################################################################
-###############################################################################################################################################
-###############################################################################################################################################
-
-
-
-
-
-#https://rpubs.com/jebyrnes/brms_bayes_sem
-
-#### fledglings
-#nr fledglings winter path
-#take out nas so that model can be well estimated without nas in standardized estimates
-library(piecewiseSEM)
-library(lme4)
-str(df)
-Fledge<-subset(df,df$NestSucces==1,
-               select=c(NrFledglings,Mean,LD_NumN, LD_Num))
-Fledge<-Fledge[complete.cases(Fledge), ]#n=17
-mylist1<-psem(
-  lm(LD_Num~Mean,na.action=na.omit, data=Fledge),
-  glm(NrFledglings~Mean+LD_Num, na.action=na.omit, data=Fledge, family=poisson(link=log))) #partly sig
-summary(mylist1, Fledge, conditional=T)
-coefs(mylist1, intercept=T) ##no effect of cond on fledgling number
-AIC(mylist1)
-
-df_Surv<-subset(df,df$NestSucces==1,
-               select=c(NrFledglings,Mean,LD_NumN, Habitat, ChickSurvival, ChickSucces))
-C_Surv<-na.omit(df_Surv) #n=28
-mylist1<-psem(
-  lm(LD_NumN~Mean,na.action=na.omit, data=C_Surv),
-  lmer(ChickSurvival~Mean+LD_NumN+(1|Habitat), na.action=na.omit, data=C_Surv)) #partly sig
-summary(mylist1, C_Surv, conditional=T) #sig effect of cond on chick surv linear model
-
-plot(df_Surv$ChickSurvival~df_Surv$Mean)
-
-#with cbind
-mylist1<-psem(
-  lm(LD_NumN~Mean,na.action=na.omit, data=C_Surv),
-  glmer(cbind(ChickSucces,ChickSurvival)~Mean+LD_NumN+(1|Habitat), na.action=na.omit, data=C_Surv, "binomial")) #partly sig
-summary(mylist1, C_Surv, conditional=T) #not working
-
-#chick succes
-C_Suc<-subset(df,C$NestSucces==1,
-              select=c(Mean,LD_NumN, Habitat, ChickSucces))
-C_Suc<-na.omit(C_Suc)
-mylist1<-psem(
-  lm(LD_NumN~Mean,na.action=na.omit, data=C_Suc),
-  glm(ChickSucces~Mean+LD_NumN, na.action=na.omit, data=C_Suc, "binomial")) #no sig effect
-summary(mylist1, C_Suc, conditional=T)
-
-plot(C$LD_NumN, C$CondN)
-plot(C$LD_Num, C$CondN)
-
-######### glmer instead of path analysis
-C$ChickSuccesTransform<-ifelse(C$ChickSucces==1,0,
-                               ifelse(C$ChickSucces==0,1,NA))
-C_Surv<-subset(C,C$NestSucces==1,
-               select=c(CondN,LD_NumN, Habitat, ChickSuccesTransform,ChickSurvival))
-C_Surv<-na.omit(C_Surv)
-plot(C_Surv$ChickSurvival,C_Surv$CondN)
-m<-glmer(cbind(ChickSuccesTransform,ChickSurvival)~CondN+LD_NumN+(1|Habitat), data=C_Surv, family=binomial)
-summary(m)
-
-##daily chick mortality rate
-df$ChickSuccesTransform<-ifelse(df$ChickSucces==1,0,
-                               ifelse(df$ChickSucces==0,1,NA))
-df_Surv<-subset(df,df$NestSucces==1,
-               select=c(Mean,LD_NumN, Habitat, ChickSucces,ChickSurvival))
-df_Surv$ChickSurvival<-ifelse(df_Surv$ChickSurvival<=0.5, 1,df_Surv$ChickSurvival)
-df_Surv<-na.omit(df_Surv)
-m<-glmer(cbind(ChickSucces,ChickSurvival)~Mean+LD_NumN+(1|Habitat), data=df_Surv, family=binomial)
-summary(m)
-
-### with proportion instead
-C_Surv<-subset(df,C$NestSucces==1,
-               select=c(Mean,LD_NumN, Habitat,ChickSurvival, ChickSuccesTransform))
-C_Surv$ChickSurvival<-ifelse(C_Surv$ChickSurvival<=0.5, 1,C_Surv$ChickSurvival)
-C_Surv$DCS<-1-(C_Surv$ChickSuccesTransform/C_Surv$ChickSurvival)
-
-C_Surv<-na.omit(C_Surv)
-summary(C_Surv)
-m<-glmer(DCS~CondN+LD_NumN+(1|Habitat), data=C_Surv, family=binomial(logit), weight=ChickSurvival)
-summary(m)
-m1<-glm(DCS~CondN+LD_NumN, data=C_Surv, family=binomial(logit), weight=ChickSurvival)
-summary(m1)
-
-#beta regression
-library(betareg)
-library(tidyverse)
-df_Surv<-subset(df,df$NestSucces==1,
-               select=c(Mean,LD_NumN, Habitat,ChickSurvival, ChickSuccesTransform))
-df_Surv$ChickSurvival<-ifelse(df_Surv$ChickSurvival<=0.5, 1,df_Surv$ChickSurvival)
-df_Surv$DCS<-1-(df_Surv$ChickSuccesTransform/df_Surv$ChickSurvival)
-str(df_Surv)
-df_Surv<-na.omit(df_Surv)
-
-df_Surv = df_Surv %>% mutate(DCS_1 = ifelse(DCS == 0, 0.001, DCS))
-df_Surv = df_Surv %>% mutate(DCS_2 = ifelse(DCS == 1, 0.99, DCS_1))
-dat.betareg <- betareg(DCS_2 ~ Mean+LD_NumN, data = df_Surv) 
-summary(dat.betareg) #ns
-
-m1 <- lm(LD_NumN ~ Mean, data = df_Surv)  #ns
-summary(m1)
-
-##
-df_Surv = df_Surv %>% mutate(DCS_1 = ifelse(DCS == 0, 0.001, DCS))
-df_Surv = df_Surv %>% mutate(DCS_2 = ifelse(DCS == 1, 0.99, DCS_1))
-dat.betareg <- betareg(DCS_2 ~ Mean+LD_NumN, data = df_Surv) 
-summary(dat.betareg) #ns
-
-####################### plotting cond~chicksurv ########################
-## from cbind model
-C$ChickSuccesTransform<-ifelse(C$ChickSucces==1,0,
-                               ifelse(C$ChickSucces==0,1,NA))
-C_Surv<-subset(C,C$NestSucces==1,
-               select=c(CondN,LD_NumN, Habitat, ChickSuccesTransform,ChickSurvival, ChickSucces))
-C_Surv<-na.omit(C_Surv)
-C_Surv$ChickSurvival<-ifelse(C_Surv$ChickSurvival<=0.5, 1,C_Surv$ChickSurvival)
-
-C_Surv$DCS<-1-(C_Surv$ChickSuccesTransform/C_Surv$ChickSurvival)
-
-m<-glmer(cbind(ChickSuccesTransform,ChickSurvival)~CondN+LD_NumN+(1|Habitat), data=C_Surv, family=binomial)
-summary(m)
-#intercept: -2.4575 , slope: -1.0660
-#C_Surv$p = exp(-2.4575 -1.0660*C_Surv$CondN)/ (1 + exp(-2.4575-1.0660*C_Surv$CondN))
-#C_Surv$pTrans<-1-(C_Surv$p)
-#C_Surv$ChickSurvival<-ifelse(C_Surv$ChickSurvival<=0.5, 1,C_Surv$ChickSurvival)
-#C_Surv$DCS<-1-(C_Surv$ChickSuccesTransform/C_Surv$ChickSurvival)
-
-##new dataframe (mnual prediction)
-summary(C_Surv$CondN)
-MyDataCS<-data.frame(CondN= seq(from = -1.7,
-                                to = 1.7, by = 0.1))
-MyDataCS$LD_NumN<-0
-MyDataCS$fit<--2.8727 -0.9182*MyDataCS$CondN+0.3583*MyDataCS$LD_NumN
-MyDataCS$fitTrans = exp(MyDataCS$fit)/ (1 + exp(MyDataCS$fit))
-MyDataCS$fitTransRev<-1-(MyDataCS$fitTrans)
-
-#manual calculation sd/ci
-## manual calculation of standard error
-lavResiduals(lvmod.6.fit)
-summary(m)
-MyDataM_P1$SRMR<-0.153
-MyDataM_P1$SRes<-sqrt(MyDataM_P1$SRMR) #residual standard error of the model (summary), see lavaan output lavResidual function (srmr) and take root of it
-MyDataM_P1$n<-334 #nr observations
-MyDataM_P1$X<-mean(f_P1$MS) #x variable in model of interest (mean), from whole dataset
-MyDataM_P1$ssd <- sum((f_P1$MS-mean(f_P1$MS))^2) #squared deviation from mean from whole dataset
-MyDataM_P1$SE<-MyDataM_P1$SRes*sqrt((1/MyDataM_P1$n)+((MyDataM_P1$MS-MyDataM_P1$X)^2)/MyDataM_P1$ssd) #formula to calculate the standard error of predicted value
-MyDataM_P1$UpperPred<-(MyDataM_P1$Comp_PredN+1.96*MyDataM_P1$SE)
-MyDataM_P1$LowerPred<-(MyDataM_P1$Comp_PredN-1.96*MyDataM_P1$SE)
-
-
-##automatic prediction glmer, no sd
-summary(C_Surv$CondN)
-MyDataCS_N1<-data.frame(CondN= seq(from = -1.7,
-                                   to = 1.7, by = 0.1))
-MyDataCS_N1$LD_NumN<-0
-MyDataCS_N1$Habitat<-c("Cropfield")
-m2<-glmer(cbind(ChickSuccesTransform,ChickSurvival)~CondN+LD_NumN+(1|Habitat), data=C_Surv, family=binomial)
-pred.se <- predict(m2, re.form=NA, full=T, MyDataCS_N1) #type="response"
-MyDataCS_N1$p <- pred.se
-MyDataCS_N1$pTrans<-exp(MyDataCS_N1$p) #back transform from log
-MyDataCS_N1$pTransRev<-1-(MyDataCS_N1$pTrans)
-
-#automatic prediction no glmer
-m1<-glm(cbind(ChickSuccesTransform,ChickSurvival)~CondN+LD_NumN, data=C, family=binomial)
-pred.se <- predict(m1,se.fit=TRUE, re.form=NA, full=T, MyDataCS_N) #type="response"
-MyDataCS_N$fit <- pred.se$fit
-MyDataCS_N$fitTrans<-exp(MyDataCS_N$fit) #back transform from log
-MyDataCS_N$fitTrans_Rev<-1-(MyDataCS_N$fitTrans)
-MyDataCS_N$SE <- pred.se$se
-MyDataCS_N$SETrans<-exp(MyDataCS_N$SE)  #back transform from log
-#MyDataCS_N$SETrans_Rev<-1-(MyDataCS_N$SETrans)
-MyDataCS_N$uprT=MyDataCS_N$fitTrans_Rev+MyDataCS_N$SE
-MyDataCS_N$lwrT=MyDataCS_N$fitTrans_Rev-MyDataCS_N$SE
-
-### model final
-##daily chick mortality rate
-C$ChickSuccesTransform<-ifelse(C$ChickSucces==1,0,
-                               ifelse(C$ChickSucces==0,1,NA))
-C_Surv<-subset(C,C$NestSucces==1,
-               select=c(CondN,LD_NumN, LD_NumN_1, Habitat, ChickSucces,ChickSuccesTransform, ChickSurvival))
-C_Surv$ChickSurvival<-ifelse(C_Surv$ChickSurvival<=0.5, 1,C_Surv$ChickSurvival)
-C_Surv<-na.omit(C_Surv)
-m<-glm(cbind(ChickSuccesTransform,ChickSurvival)~Mean+LD_NumN, data=df_Surv, family=binomial)
-summary(m)
-str(df_Surv)
-
-library(visreg)
-visreg(m, "Mean", xlab="Body condition", ylab="Log daily chick mortality")
-visreg(m, "Mean", xlab="Body condition", ylab="Daily chick mortality", scale="response")
-visreg(m, "Mean", xlab="Body condition", ylab="Daily nest mortality", scale="response", partial=TRUE)
-
-visreg(m, "LD_NumN", xlab="Laying date", ylab="Log daily chick mortality")
-visreg(m, "LD_NumN", xlab="Laying date", ylab="Daily chick mortality", scale="response")
-visreg(m, "LD_NumN", xlab="Laying date", ylab="Daily chick mortality", scale="response", partial=TRUE)
-
-
-##plotting in seperate r sscript
-
-plot( C_Surv$CondN, C_Surv$DCS)
-points(C_Surv$CondN, C_Surv$ChickSucces,col="red")
-lines(MyDataCS$CondN, MyDataCS$fitTransRev, col="green")#manual prediction
-lines(MyDataCS_N1$CondN, MyDataCS_N1$pTransRev, col="blue") #automatic prediction glmer, no sd, crop
-lines(MyDataCS_N$CondN, MyDataCS_N$fitTrans_Rev, col="orange") #automatic prediction, no glmer
-lines(MyDataCS_N$CondN, MyDataCS_N$uprT, col="orange", lty=2)
-lines(MyDataCS_N$CondN, MyDataCS_N$lwrT, col="orange", lty=2)
-
-plot(prop.table(cbind(NS$Fail, NS$ObsDay), 1)[,1]~NS$CondN, ylab="Beetles (proportional)", xlab="Altitude")
-plot(NS$CondN,NS$Fail)
-lines(MyDataNS$CondN, MyDataNS$fitTrans, col="green")#manual prediction
-lines(MyDataNS$CondN, MyDataNS$lwrT, col="green", lty=2)#manual prediction
-lines(MyDataNS$CondN, MyDataNS$uprT, col="green", lty=2)#manual prediction
-
-#plot on log scale
-plot(NS$CondN,NS$Fail)
-NS$logDNS<-log(NS$DNS)
-plot(NS$CondN,NS$logDNS)
-plot(MyDataNS$CondN,MyDataNS$fit)
-
-```
-
-```{r iinclude=F}
-###################################################################################################################################
-#nr hatchlings
-str(C)
-summary(C$NrHatchlings)
-Hatch<-subset(C,
-              select=c(NrHatchlings,CondN,LD_Num))
-Hatch<-Hatch[complete.cases(Hatch), ]
-mylist1<-psem(
-  lm(LD_Num~CondN,na.action=na.omit, data=Hatch),
-  glm(NrHatchlings~CondN+LD_Num, na.action=na.omit, data=Hatch, family=poisson(link=log))) #partly sig
-summary(mylist1, Fledge, conditional=T)
-coefs(mylist1, intercept=T)
-AIC(mylist1)
-
-### daily nest surv
-str(C)
-C$DNS<-1-(C$Fail/C$ObsDay)
-levels(C$Habitat)
-summary(C$Habitat)
-C_Inland<-subset(C, Habitat=="Cropfield"|Habitat=="Grassland"|Habitat=="Urban"|Habitat=="Dune"|Habitat=="Nature")
-C_Island<-subset(C, Habitat=="Saltmarsh")
-C_Inland$LD_NumN_1<-((C_Inland$LD_Num)-mean(C_Inland$LD_Num, na.rm=T))/(sd(C_Inland$LD_Num, na.rm=T))
-C_Island$LD_NumN_1<-((C_Island$LD_Num)-mean(C_Island$LD_Num, na.rm=T))/(sd(C_Island$LD_Num, na.rm=T))
-
-C<-rbind(C_Island,C_Inland)
-
-NS<-subset(C,
-           select=c(DNS,CondN,LD_NumN, LD_Num,ObsDay,FailTransform, Fail, Habitat, LD_NumN_1))
-NS$Fail<-as.numeric(NS$Fail)
-str(NS)
-NS<-NS[complete.cases(NS), ] #n=46
-mylist1<-psem(
-  lm(LD_NumN~CondN,na.action=na.omit, data=NS),
-  glm(Fail~CondN+LD_NumN, data=NS, "binomial")) # sig
-summary(mylist1, NS, conditional=T)
-coefs(mylist1, intercept=T)
-AIC(mylist1)
-
-#prop
-mylist1<-psem(
-  lm(LD_NumN~CondN,na.action=na.omit, data=NS),
-  glm(DNS~CondN+LD_NumN, data=NS, "binomial")) #ns
-summary(mylist1, NS, conditional=T)
-coefs(mylist1, intercept=T)
-AIC(mylist1)
-
-#cbind
-mylist1<-psem(
-  lm(LD_NumN~CondN,na.action=na.omit, data=NS),
-  glm(cbind(Fail, ObsDay)~CondN+LD_NumN, data=NS, "binomial")) #ns
-summary(mylist1, NS, conditional=T) #not working
-coefs(mylist1, intercept=T)
-AIC(mylist1)
-
-### glms
-m<-glmer(cbind(Fail,ObsDay)~CondN+LD_NumN+(1|Habitat), na.action=na.omit, data=NS, family=binomial)
-summary(m)
-
-m<-glm(cbind(Fail,ObsDay)~CondN+LD_NumN_1, na.action=na.omit, data=NS, family=binomial)
-summary(m)
-
-m<-glm(DNS~CondN+LD_NumN, na.action=na.omit, data=NS, family=binomial)
-summary(m)
-
-summary(NS)
-
-################## plotting
-#automatic prediction no glmer
-summary(NS$CondN)
-MyDataNS<-data.frame(CondN= seq(from = -3,
-                                to = 2.5, by = 0.1))
-MyDataNS$LD_NumN<-0
-pred.se <- predict(m,se.fit=TRUE, full=T, MyDataNS) #type="response"
-MyDataNS$fit <- pred.se$fit
-MyDataNS$fitTrans = exp(MyDataNS$fit)/ (1 + exp(MyDataNS$fit))
-#MyDataNS$fitTrans_Rev<-1-(MyDataNS$fitTrans)
-MyDataNS$SE <- pred.se$se
-MyDataNS$SETrans<-exp(MyDataNS$SE)/ (1 + exp(MyDataNS$SE)) #back transform from log
-#MyDataCS_N$SETrans_Rev<-1-(MyDataCS_N$SETrans)
-MyDataNS$uprT=MyDataNS$fitTrans+MyDataNS$SETrans
-MyDataNS$lwrT=MyDataNS$fitTrans-MyDataNS$SETrans
-
-plot(prop.table(cbind(NS$Fail, NS$ObsDay), 1)[,1]~NS$CondN, ylab="Beetles (proportional)", xlab="Altitude")
-
-library(visreg)
-visreg(m, "CondN", xlab="Body condition", ylab="Log daily nest failure")
-visreg(m, "CondN", xlab="Body condition", ylab="Daily nest failure", scale="response")
-visreg(m, "CondN", xlab="Body condition", ylab="Daily nest failure", scale="response", partial=TRUE)
-
-visreg(m, "LD_NumN_1", xlab="Laying date", ylab="Log daily nest failure")
-visreg(m, "LD_NumN_1", xlab="Laying date", ylab="Daily nest failure", scale="response")
-visreg(m, "LD_NumN_1", xlab="Laying date", ylab="Daily nest failure", scale="response", partial=TRUE)
-
-
-```
-
-```{r include=F}
-plot(NS$CondN,NS$FailTransform)
-
-m<-glmer(cbind(Fail,ObsDay)~CondN+LD_NumN+(1|Habitat), na.action=na.omit, data=NS, family=binomial)
-summary(m)
-
-m<-glmer(cbind(Fail,ObsDay)~CondN+(1|Habitat), na.action=na.omit, data=NS, family=binomial)
-summary(m)
-
-m<-glmer(Fail~CondN+LD_NumN+(1|Habitat), na.action=na.omit, data=NS, family=binomial(logit), weight=ObsDay)
-summary(m)
-
-effects_DNS <- effects::effect(term= "CondN", mod= m)
-summary(effects_DNS) #output of what the values are
-x_DNS <- as.data.frame(effects_DNS)
-library(ggplot2)
-DNS_plot <- ggplot() + 
-  geom_boxplot(data=x_DNS, aes(x=CondN, y=fit))+
-  labs(x = "Nest success", y="Winter body condition")
-
-m<-glmer(FailTransform~CondN+LD_NumN+(1|Habitat), na.action=na.omit, data=NS, family="binomial")
-summary(m)
-str(NS)
-
-eall.lm1 <- effects::predictorEffects(m)
-plot(eall.lm1)
-DNS_plot
-
-m<-glm(cbind(Fail,ObsDay)~CondN+LD_NumN, na.action=na.omit, data=NS, family=binomial)
-summary(m)
-summary(NS$CondN)
-xNS <- seq(-3, 2.5, 0.1)
-xLD<-0
-MyDataNS<-data.frame(CondN= seq(from = -3,
-                                to = 2.5, by = 0.1))
-MyDataNS$LD_NumN<-0
-MyDataNS$yNS <- predict(m, newdata=MyDataNS,type="response")
-plot(NS$CondN, NS$Fail, pch = 16, xlab = "WEIGHT (g)", ylab = "VS")
-lines(MyDataNS$CondN, MyDataNS$yNS)
-
-# This fits the model
-model=glm(cbind(d$beetles, d$rest)~altitude,family=binomial(logit),data=d)   
-m<-glm(cbind(Fail,ObsDay)~CondN+LD_NumN, na.action=na.omit, data=NS, family=binomial(logit))
-
-# The plot of proportion of beetles against the altitude
-plot(prop.table(cbind(NS$Fail, NS$ObsDay), 1)[,1]~NS$CondN, ylab="Beetles (proportional)", xlab="Altitude")
-
-# The prediction of the proportion of the beetles from the fit
-pred<-predict(m,type="response")
-
-# Ordering the predicted values (and altitude) according to the altitude
-pred2<-pred[order(NS$CondN)]
-Con<-NS$CondN[order(NS$CondN)]
-
-# Drawing the line
-window()
-plot.new()
-lines(Con,pred2)
-
-ggplot()+
-  geom_point(data=NS, aes(x=CondN, y=prop.table(cbind(NS$Fail, NS$ObsDay), 1)[,1]))+
-  geom_line(aes(x=Con, y=pred2))+
-  labs(x = "Nest success", y="Winter body condition")
-
-levels(NS$FailTransformF)
-NS$FailTransformF<-factor(NS$FailTransform, levels=c("0", "1"), labels=c("no", "yes"))
-str(NS)
-ggplot()+
-  geom_point(data=NS, aes(x=CondN, y=Fail))+
-  geom_line(data=MyDataNS, aes(x=CondN, y=yNS))+
-  labs(x = "Nest success", y="Winter body condition")
-str(C)
-C$ChickSuccesTransform<-ifelse(C$ChickSucces==1,0,
-                               ifelse(C$ChickSucces==0,1,NA))
-m1<-glmer(cbind(ChickSucces,ChickSurvival)~CondN+LD_NumN+(1|Habitat), na.action=na.omit, data=C, family=binomial)
-
-m<-glmer(cbind(ChickSuccesTransform,ChickSurvival)~CondN+LD_NumN+(1|Habitat), na.action=na.omit, data=Fledge, family=binomial)
-summary(m)
-
-plot(Fledge$CondN, Fledge$ChickSucces)
-
-summary(m1)
-m1<-glm(ChickSucces~CondN+LD_NumN+(1|Habitat), data=Fledge, family=binomial)
-str(Fledge)
-str(C$ChickSurvival)
-str(C$CondN)
-str(C$LD_NumN)
-summary(m1)
-
-C$ChickSuccesF<-factor(C$ChickSucces, levels=c("0", "1"), labels=c("yes", "no"))
-ggplot(C,aes(ChickSuccesF,CondN))+
-  geom_boxplot()+
-  labs(x = "Chick success", y="Winter body condition")
-
-summary(glm(cbind(Fail,ObsDay)~CondN+LD_NumN, na.action=na.omit, data=NS, family=binomial))
-
-```
-
-```{r include=F}
-#with random term winter
-mylist3<-psem(
-  lm(LD_Num~WCondN,na.action=na.omit, data=final1),
-  glmer(NrFledglings~WCondN+LD_Num+(1|Habitat), na.action=na.omit, data=final1, family=poisson)) #partly sig
-summary(mylist1, final, conditional=T)
-AIC(mylist3)
-
-#plot indirect effect , verschil voor een standard deviatie van winter conditie verschuift fledglings om 0.05 naar voren
-x<-exp( -2.1913)
-x #bij ld=0, x=0.12
-
-y<-exp(-2.1913+((-1.3077)*(-0.2882)))
-y #bij ld=-0.31 (een stap in winterconditie standard deviatie), y=0.17
-
-l<-y-x 
-l #verschil is 0.05
-l1<-(l/0.2882)*100
-l1 #18% verbetering in fledglings 
-
-setwd("P:/CHIRP/Carry-over")
-p<-read.csv("poisson plot.csv", header=T, dec=",",sep=";", fill=T)
-plot(p$FL~p$LD)
-
-mean(final1$LDN, na.rm=T)
-mean(final1$WCondN, na.rm=T)
-sd(final1$WCondN, na.rm=T)
-sd(final1$LDN, na.rm=T)
-
-#plot direct effect
-#from lm
-library(visreg)
-m1<-glm(NrFledglings~WCondN, data=final1, family=poisson)
-m1<-glm(NrFledglings~SCond, data=final1, family=poisson)
-visreg(m1)
-library(lattice)
-xyplot(NrFledglings~WCondN,data=final1, type=c("p","r"))
-xyplot(NrFledglings~LDN,data=final1, type=c("p","r"))
-
-
-# from sem
-x<-exp( -2.1913)
-x #x=0.12
-
-y<-exp( -2.1913+((-0.4774)*(-0.2882)))
-y # 0.13
-
-l<-y-x
-l #effect is 0.02 (0,02/3,1)*100
-l1<-(l/0.2882 )*100
-l1#=5.92%
-
-
-#summer paths
-#nr fledglings with summer path
-mylist2<-psem(
-  lme(LDN~SCondN, random=~1|IC,na.action=na.omit, data=final1),
-  glm(NrFledglings~SCondN+LDN, na.action=na.omit, data=final1, family=poisson(link=log))) #partly sig
-summary(mylist2, final, conditional=T)
-coefs(mylist2, intercept=T, standardize='range')
-
-
-#direct path
-# from sem
-x<-exp(  -2.9629)
-x #x=0.12
-
-y<-exp(-2.9629+((-0.3533)*(-0.3585))) #
-y # 0.13
-
-l<-y-x
-l #effect is 0.02 (0,02/3,1)*100
-l1<-(l/0.3585 )*100
-l1#=2%
-
-
-#plot indirect effect , verschil voor een standard deviatie van winter conditie verschuift fledglings om 0.05 naar voren
-x<-exp( -2.9629)
-x #bij ld=0, x=0.12
-
-y<-exp(-2.9629+((-1.9661)*(-0.3585)))
-y #bij ld=-0.31 (een stap in winterconditie standard deviatie), y=0.17
-
-l<-y-x 
-l #verschil is 0.05
-l1<-(l/0.3585)*100
-l1 #15%
-
-
-#ssummer cond  ~winter cond
-summary(lm(SCond~WCondN, data=final1))
-plot(SCond~WCond, data=final1)
-
-library(lattice)
-visreg()
-
-
-# mechanisme
-#nestfase: proportie fledglings/hatchlings
-final1$propHatch<-final1$NrHatchlings/final1$ClutchSize
-final1$AsinPropHatch<-asin(sign(final1$propHatch) * sqrt(abs(final1$propHatch)))
-
-mylist1<-psem(
-  lm(LDN~1+WCondN,na.action=na.omit, data=final1),
-  lm(AsinPropHatch~1+WCondN+LDN, na.action=na.omit, data=final1)) #partly sig
-summary(mylist1, final, conditional=T)
-coefs(mylist1, intercept=T)
-
-plot(final1$propHatch)
-
-
-#kuikenfase: proportie hatchlings/clutchsize
-final1$propFledge<-final1$NrFledglings/final1$NrHatchlings
-final1$AsinPropFledge<-asin(sign(final1$propFledge) * sqrt(abs(final1$propFledge)))
-
-mylist1<-psem(
-  lm(LDN~1+WCondN,na.action=na.omit, data=final1),
-  lm(AsinPropFledge~1+WCondN+LDN, na.action=na.omit, data=final1)) #partly sig
-summary(mylist1, final, conditional=T)
-coefs(mylist1, intercept=T)
-
-plot(final1$propFledge)
