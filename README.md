@@ -20,12 +20,12 @@ Codes for analyses
 - Indirect effect: indirect effect of winter environment on reproduction through body condition
 
 Files and codes for figures (if in seperate script)
-fig 3 
-symbols for figures
+- fig 3: seperate script to screate figure 3
+- symbols for figures: pngs used as images in the figures
 
-output:
-- output1
-- output 2 hema ref
+Output
+- output: output from the nimble model (mass is used as reference variable)
+- outputHemaRef: output from the nimble model where Hematocrit is used as reference variable
 
 Global environments are archived on zenodo because the file sizes are too big for GitHub.
   
