@@ -19,7 +19,7 @@ Magali Frauendorf, Andrew M. Allen, Henk-Jan van der Kolk, Sarah Cubaynes, Bruno
 - coe env.R: effect of environment on condition
 - Indirect effect: indirect effect of winter environment on reproduction through body condition
 
-## Files and codes for figures (if in seperate script)
+## Files and codes for figures
 - Figure3.R: seperate script to screate figure 3
 - symbols for figures: pngs used as images in the figures
 
