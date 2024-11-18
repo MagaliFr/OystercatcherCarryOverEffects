@@ -1,12 +1,12 @@
 ######################### Analyse carry-over effect #########################################
 ################# path analysis
-load("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig4/GlobalEnvFig4.Rdata")
+load("YOUR_PATH/GlobalEnvFig4.Rdata")
 library(brms)
 library(bayesplot)
 
 #carry over dataset read
 #read table
-R<-read.csv("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Data/DataAnalysis/Carry-over dataset final.csv", header=T, dec=",", sep=";", fill=T)
+R<-read.csv("YOUR_PATH/Carry-over dataset final.csv", header=T, dec=",", sep=";", fill=T)
 str(R)
 
 ### check that if success=1, chicksurvival in days is also at least 30 and not na
