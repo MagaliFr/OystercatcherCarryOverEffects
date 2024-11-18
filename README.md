@@ -4,6 +4,7 @@ Authors:
 Magali Frauendorf, Andrew M. Allen, Henk-Jan van der Kolk, Sarah Cubaynes, Bruno J. Ens, Simon Verhulst, Eelke Jongejans, Hans de Kroon, Kees Oosterbeek, Karin Troost, Martijn van de Pol
 
 *File list and description:*
+
 Data
 - AgeMatrix.csv: age matrix for the MSM-SEM model
 - StateMatrix.csv: state matrix for the MSM-SEM model with condition variables of each individual
