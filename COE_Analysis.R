@@ -6,7 +6,7 @@ library(bayesplot)
 
 #carry over dataset read
 #read table
-R<-read.csv("YOUR_PATH/Carry-over dataset final.csv", header=T, dec=",", sep=";", fill=T)
+R<-read.csv("YOUR_PATH/COE_data.csv", header=T, dec=",", sep=";", fill=T)
 str(R)
 
 ### check that if success=1, chicksurvival in days is also at least 30 and not na
