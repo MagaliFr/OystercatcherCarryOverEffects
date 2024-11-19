@@ -28,7 +28,7 @@ env<- read.table("YOUR_PATH/EnvironmentalVariables.csv", header=T,dec=".", sep="
 str(env)
 summary(env)
 
-plot(env$NrSamplesFood_C~env$Kg_C_avail_Ind) # onder 20 eruit?, of onder 5 om die met 400 eruit te halen
+plot(env$NrSamplesFood_C~env$Kg_C_avail_Ind) 
 plot(env$NrSamplesFood_M~env$Kg_M_avail_Ind)
 
 
@@ -46,7 +46,7 @@ ID$ObsCatchNr.x<-factor(ID$ObsCatchNr.x)
 str(ID$ObsCatchNr.x)
 summary(ID$ObsCatchNr.x)
 ID$State<-0
-ID$YearShort<-ifelse(ID$ObsCatchNr.x=="1", "2001", #van winter '00-'01 to summer '01
+ID$YearShort<-ifelse(ID$ObsCatchNr.x=="1", "2001", # winter '00-'01 to summer '01
                      ifelse(ID$ObsCatchNr.x=="3", "2001", 
                             ifelse(ID$ObsCatchNr.x=="4", "2001", 
                                    ifelse(ID$ObsCatchNr.x=="5", "2001", 
@@ -63,13 +63,13 @@ ID$YearShort<-ifelse(ID$ObsCatchNr.x=="1", "2001", #van winter '00-'01 to summer
                                                                                                                 ifelse(ID$ObsCatchNr.x=="392", "2003",
                                                                                                                        ifelse(ID$ObsCatchNr.x=="395", "2003",
                                                                                                                               ifelse(ID$ObsCatchNr.x=="396","2003",
-                                                                                                                                     ifelse(ID$ObsCatchNr.x=="66900332", "2017", #van winter '16-'17 to summer '17
+                                                                                                                                     ifelse(ID$ObsCatchNr.x=="66900332", "2017", # winter '16-'17 to summer '17
                                                                                                                                             ifelse(ID$ObsCatchNr.x=="66900333", "2017", 
                                                                                                                                                    ifelse(ID$ObsCatchNr.x=="66900334", "2017", 
                                                                                                                                                           ifelse(ID$ObsCatchNr.x=="66900335", "2017", 
                                                                                                                                                                  ifelse(ID$ObsCatchNr.x=="66900349", "2017",
                                                                                                                                                                         ifelse(ID$ObsCatchNr.x=="66900364", "2017",
-                                                                                                                                                                               ifelse(ID$ObsCatchNr.x=="66900365", "2017","2018")))))))))))))))))))))))) #396
+                                                                                                                                                                               ifelse(ID$ObsCatchNr.x=="66900365", "2017","2018")))))))))))))))))))))))) 
 
 
 
@@ -445,500 +445,11 @@ sig.r     1.18   1.18    0.02      1.14      1.23
 sig.temp  0.99   0.99    0.02      0.96      1.03
 sig.prec  0.98   0.98    0.02      0.95      1.02
 
-#############################################################
-#### interaction bill shape (continuous bill tip height and age class) 
-Cov<-read.csv(file="P:/CHIRP/Carry-over/Analysis/Data/DataAnalysis/StateMatrix2000_2019Cond_3class_9Years_ID_ForEnv.csv")
-str(Cov)
-hist(Cov$BH)
-table(Cov$BillShape)
-BS<-Cov[,6]
-BS<-factor(BS)
-BH<-Cov[,7]
-
-Cov1<-read.csv(file="N:/Dep.AnE/AnE-share/_Magali/Nimble_M1_P12/StateMatrix2000_2019Cond_3class9Years.csv")
-str(Cov1)
-Age<-Cov1[,2]
-
-Cov<-cbind(ID,BS, Age, BH)
-head(Cov)
-
-df$WaderID_ObsOcc<-paste(df$WaderBirdID,df$ObsCatchNr,sep="_")
-Cov$WaderID_ObsOcc<-paste(Cov$WaderBirdID,Cov$ObsCatchNr,sep="_")
-
-library(plyr)
-df<-join(Cov, df, by = "WaderID_ObsOcc", type = "left", match = "all")
-str(df)
-summary(df$BS)
-#B   H  HB   P  PB  PH 
-#361  67  23 373 713  37 
-
-df$BillShape<-ifelse(df$BS=="B"|df$BS=="H"|df$BS=="HB","B",
-                      ifelse(df$BS=="P","P","I"
-                               ))
-df$BillShape<-factor(df$BillShape)
-summary(df$BillShape1)
-df$BillShape<-df$BillShape
-summary(df$BillShape)
-#B   I   P 
-#451 750 373
-
-################### take competition, food (including exposure time) seperately ########
-str(df)
-#response variable, = eta in cr-sem
-r<-df[,13]
-
-## food including exposure time
-df$AFDMgrm2_C_CondLoss_exp<-df$AFDMgrm2_C_CondLoss*df$Avg_exp_NovFeb
-df$AFDMgrm2_M_CondLoss_exp<-df$AFDMgrm2_M_CondLoss*df$Avg_exp_NovFeb
-str(df)
-
-# Other covariates are continuous : condition index
-food2 <- subset(df,
-                select=c(PropGrassland))
-food1<-df[,46:47]
-comp <- subset(df,
-               select=c(Density_km2))
-weather<-df[,35:39] # 1 month
-head(weather)
-BH<-subset(df,
-           select=c(BH))
-Age<-subset(df,
-           select=c(Age))
-contcov<-cbind(food1,food2,comp,weather, BH, Age)
-head(contcov)
-# we need to standardize each value ( (x- mean(x) /sd(x) )
-mean.cov = apply(contcov,2,mean) # mean of each covariate
-mean.mat = matrix(rep(mean.cov,nrow(contcov)),byrow=T,ncol=ncol(contcov))
-sd.cov = apply(contcov,2,sd)
-sd.mat = matrix(rep(sd.cov,nrow(contcov)),byrow=T,ncol=ncol(contcov))
-
-stcov = (contcov-mean.mat)/sd.mat # stcov = standardized covariates values of the continuous individual covariates
-dim(stcov) # 8 continuous covariates
-names(stcov)
-#[1] "AFDMgrm2_C_CondLoss_exp" "AFDMgrm2_M_CondLoss_exp" "PropGrassland"           "comp"                   
-#[5] "avgTemp_1M"              "avgWC_1M"                "sumRH_month_1M"          "PrepAnom_month_1M"      
-#[9] "sumWS_1M"  "BH"                      "Age"  
-cor(stcov)
-
-n <- nrow(contcov)
-
-df$ObsNum<-as.numeric(df$ObsCatchNr)
-str(df)
-Site<-df[,48]
-nsites <- max(Site)
-
-#BS<-as.numeric(df$BillShape)
-
-mydata<-cbind(r,stcov, Site)
-
-#### run model 
-library(nimble)
-NimbleCode<-nimbleCode({
-  
-  for (i in 1:n){
-    # latent variable temperature
-    mu1[i] <- temp[i]
-    cov[i,5] ~ dnorm(mu1[i],sd=sig5x)
-    
-    mu2[i] <- gamma1 * temp[i]
-    cov[i,6] ~ dnorm(mu2[i],sd=sig5x)
-    
-    mu3[i] <- gamma2 * temp[i]
-    cov[i,9] ~ dnorm(mu3[i],sd=sig9x)
-    
-    # latent variable precipitation
-    mu4[i] <-  prec[i]
-    cov[i,7] ~ dnorm(mu4[i],sd=sig7x)
-    
-    mu5[i] <- gamma3 * prec[i]
-    cov[i,8] ~ dnorm(mu5[i],sd=sig7x)
-  }
-  
-  for (i in 1:n){
-    predicted.r[i] <- beta0 + 
-      beta1 * temp[i] + beta2 * prec[i] + beta3 * cov[i,1] + beta4 * cov[i,2] + beta5 * cov[i,3] + beta6 * cov[i,4] + 
-      beta7 * cov[i,10] +
-      beta8 * cov[i,10] * temp[i] + beta9 * cov[i,10] * prec[i] + beta10 * cov[i,10] * cov[i,1] + beta11 * cov[i,10] * cov[i,2] + beta12 * cov[i,10] * cov[i,3] + beta13 * cov[i,10] * cov[i,4] + 
-      beta14 * cov[i,11] * temp[i] + beta15 * cov[i,11] * prec[i] + beta16 * cov[i,11] * cov[i,1] + beta17 * cov[i,11] * cov[i,2] + beta18 * cov[i,11] * cov[i,3] + beta19 * cov[i,11] * cov[i,4] + 
-      beta20 * pow(cov[i,11],2) * temp[i] + beta21 * pow(cov[i,11],2) * prec[i] + beta22 * pow(cov[i,11],2) * cov[i,1] + beta23 * pow(cov[i,11],2) * cov[i,2] + beta24 * pow(cov[i,11],2) * cov[i,3] + beta25 *pow(cov[i,11],2) * cov[i,4] + 
-      eps[Site[i]]
-
-    r[i] ~ dnorm(predicted.r[i], sd = sig.r)
-  } #i
-  
-  # prior random site effect
-  for (j in 1:nsites-1){ #site 36 is reference level (=beta0), nsites-1
-    eps[j] ~ dnorm(mu.eps, sd=sig.eps) #
-  }
-  # fix the effect of the first level (reference group: eps1) to 0 because we use intercept beta0
-  #eps[14] <- 0 # site 14, highest nr obs
-  
-  #for BS
-  #beta7[2] ~ dnorm(0,1)
-  #beta7[3] ~ dnorm(0,1)
-  #beta8[2] ~ dnorm(0,1)
-  #beta8[3] ~ dnorm(0,1)
-  #beta9[2] ~ dnorm(0,1)
-  #beta9[3] ~ dnorm(0,1)
-  #beta10[2] ~ dnorm(0,1)
-  #beta10[3] ~ dnorm(0,1)
-  #beta11[2] ~ dnorm(0,1)
-  #beta11[3] ~ dnorm(0,1)
-  #beta12[2] ~ dnorm(0,1)
-  #beta12[3] ~ dnorm(0,1)
-  #beta13[2] ~ dnorm(0,1)
-  #beta13[3] ~ dnorm(0,1)
-  
-  # fix the effect of the first level (reference groups: B) to 0 because we use intercepts beta0
-  #beta7[1] <- 0 # B billshape
-  #beta8[1] <- 0 # B billshape
-  #beta9[1] <- 0 # B billshape
-  #beta10[1] <- 0 # B billshape
-  #beta11[1] <- 0 # B billshape
-  #beta12[1] <- 0 # B billshape
-  #beta13[1] <- 0 # B billshape
-  
-  #beta71<-mean(c(eps[1], eps[2], eps[3], eps[4], eps[5], eps[6], eps[7],
-  #               eps[8],eps[9],eps[10],eps[11],eps[12],eps[13],eps[14],
-  #               eps[15],eps[16],eps[17],eps[18],eps[19],eps[20],eps[21],eps[22],
-  #               eps[23],eps[24],eps[25],eps[26],eps[27],eps[28],eps[29],eps[30],
-  #               eps[31],eps[32],eps[33],eps[34],eps[35])) + beta0
-  
-  
-  #priors for continuous fixed effects and latent variable
-  for (i in 1:n){
-    temp[i] ~ dnorm(0, sd=sig.temp)
-    prec[i] ~ dnorm(0, sd=sig.prec)
-    cov[i,1] ~ dnorm(0, sd=sig1x)
-    cov[i,2] ~ dnorm(0, sd=sig2x)
-    cov[i,3] ~ dnorm(0, sd=sig3x)
-    cov[i,4] ~ dnorm(0, sd=sig4x)
-    cov[i,10] ~ dnorm(0, sd=sig10x)
-    cov[i,11] ~ dnorm(0, sd=sig11x)
-  } 
-  
-  #priors
-  beta0 ~ dnorm(0,1)
-  gamma1 ~ dnorm(0,1)
-  gamma2 ~ dnorm(0,1)
-  gamma3 ~ dnorm(0,1)
-  #gamma4 ~ dnorm(0,1)
-  #gamma42 ~ dnorm(0,1)
-  #gamma5 ~ dnorm(0,1)
-  #gamma52 ~ dnorm(0,1)
-  #gamma62 ~ dnorm(0,1)
-  #gamma72 ~ dnorm(0,1)
-  #gamma8 ~ dnorm(0,1)
-  #gamma82 ~ dnorm(0,1)
-  #beta0 ~ dnorm(0,1)
-  beta1  ~ dnorm(0,1)
-  beta2  ~ dnorm(0,1)
-  beta3  ~ dnorm(0,1)
-  beta4  ~ dnorm(0,1)
-  beta5  ~ dnorm(0,1)
-  beta6  ~ dnorm(0,1)
-  beta7  ~ dnorm(0,1)
-  beta8  ~ dnorm(0,1)
-  beta9  ~ dnorm(0,1)
-  beta10  ~ dnorm(0,1)
-  beta11  ~ dnorm(0,1)
-  beta12  ~ dnorm(0,1)
-  beta13  ~ dnorm(0,1)
-  beta14  ~ dnorm(0,1)
-  beta15  ~ dnorm(0,1)
-  beta16  ~ dnorm(0,1)
-  beta17  ~ dnorm(0,1)
-  beta18  ~ dnorm(0,1)
-  beta19  ~ dnorm(0,1)
-  beta20  ~ dnorm(0,1)
-  beta21  ~ dnorm(0,1)
-  beta22  ~ dnorm(0,1)
-  beta23  ~ dnorm(0,1)
-  beta24  ~ dnorm(0,1)
-  beta25  ~ dnorm(0,1)
-  sig1x ~ dunif(0,10)
-  sig2x ~ dunif(0,10)
-  sig3x ~ dunif(0,10)
-  sig4x ~ dunif(0,10)
-  sig5x ~ dunif(0,10)
-  sig10x ~ dunif(0,10)
-  sig11x ~ dunif(0,10)
-  sig7x ~ dunif(0,10)
-  sig9x ~ dunif(0,10)
-  sig.temp ~ dunif(0,10)
-  sig.r ~ dunif(0,10)
-  sig.prec ~ dunif(0,10)
-  mu.eps ~ dnorm(0,1)
-  sig.eps ~ dunif(0,10)
-})
-
-#constants
-constants <- list(n=n, Site=Site, nsites=nsites, cov=stcov)
-
-#data
-mydatax <- list(r=r)
-
-mySeed <- 124
-set.seed(mySeed)
-
-# Initial values
-initsFunction <- function() list(
-  gamma1=rnorm(1,0,1), gamma2=rnorm(1,0,1), gamma3=rnorm(1,0,1), 
-  #gamma4=rnorm(1,0,1), gamma5=rnorm(1,0,1), #gamma42=rnorm(1,0,1), gamma52=rnorm(1,0,1), 
-  #gamma62=rnorm(1,0,1), gamma72=rnorm(1,0,1), 
-  #gamma8=rnorm(1,0,1), gamma82=rnorm(1,0,1), 
-  sig1x=runif(1,0,10), sig2x=runif(1,0,10), sig3x=runif(1,0,10),
-  sig4x=runif(1,0,10), sig5x=runif(1,0,10), 
-  sig10x=runif(1,0,10), 
-  sig11x=runif(1,0,10), 
-  sig7x=runif(1,0,10), 
-  sig9x=runif(1,0,10), 
-  sig.r=runif(1,0,10),
-  beta0=rnorm(1,0,1),
-  beta1=rnorm(1,0,1), #beta0=rnorm(1,0,1),
-  beta2=rnorm(1,0,1),
-  beta3=rnorm(1,0,1),
-  beta4=rnorm(1,0,1),
-  beta5=rnorm(1,0,1),
-  beta6=rnorm(1,0,1),
-  beta7=rnorm(1,0,1),
-  beta8=rnorm(1,0,1),
-  beta9=rnorm(1,0,1),
-  beta10=rnorm(1,0,1),
-  beta11=rnorm(1,0,1),
-  beta12=rnorm(1,0,1),
-  beta13=rnorm(1,0,1),
-  beta14=rnorm(1,0,1), beta15=rnorm(1,0,1),
-  beta16=rnorm(1,0,1),beta17=rnorm(1,0,1),beta18=rnorm(1,0,1),
-  beta19=rnorm(1,0,1),beta20=rnorm(1,0,1),beta21=rnorm(1,0,1),beta22=rnorm(1,0,1),
-  beta23=rnorm(1,0,1),beta24=rnorm(1,0,1),beta25=rnorm(1,0,1),
-  temp=rnorm(n,0,1), prec=rnorm(n,0,1),
-  sig.temp=runif(1,0,10), sig.prec=runif(1,0,10), 
-  sig.eps=runif(1,0,10),
-  mu.eps=rnorm(1,0,1) , eps=rnorm(nsites,0,1)
-  #food=rnorm(n,0,1)
-  #r=rnorm(56664,0,1)
-)
-
-initsList1 <- initsFunction()
-initsList2 <- initsFunction()
-initVals <- c(initsList1,initsList2)
-
-params<-c("cov",
-          "gamma1", "gamma2", "gamma3",
-          #"gamma4","gamma5",
-          #"gamma42","gamma52",
-          #"gamma62","gamma72",
-          #"gamma8","gamma82",
-          "beta0",
-          "beta1", "beta2",
-          "beta3",
-          "beta4","beta5",
-          "beta6",
-          "beta7","beta8","beta9","beta10",
-          "beta11","beta12","beta13","beta14","beta15","beta16","beta17","beta18",
-          "beta19","beta20","beta21","beta22","beta23","beta24","beta25",
-          #"beta71",
-          #"beta12", "beta22",
-          #"beta32","beta42","beta52",
-          "sig1x","sig2x","sig3x",
-          "sig4x", "sig5x", 
-          "sig10x", "sig11x",
-          "sig7x", 
-          "sig9x",
-          "eps",
-          "temp", "prec", 
-          "sig.temp", "sig.prec", 
-          "sig.r", "mu.eps", "sig.eps",
-          "predicted.r")
-
-RModel<-nimbleModel(
-  code = NimbleCode,
-  data=mydatax,
-  constants=constants,
-  inits = initVals, 
-  calculate=F)
-
-Cmodel <- compileNimble(RModel)
-
-conf <- configureMCMC(RModel, monitors=params, useConjugacy = FALSE) #eventually useConjugacy = FALSE
-
-Rmcmc <- buildMCMC(conf, enableWAIC = TRUE)
-
-Cmcmc <- compileNimble(Rmcmc, project = Cmodel, showCompilerOutput = F)
-
-memory.limit()
-memory.limit(80000)
-samplesList <- runMCMC(Cmcmc,
-                       niter = 1, #15000
-                       nburnin = 1, #1000
-                       nchains = 2, samplesAsCodaMCMC=TRUE, WAIC=TRUE, summary=T,
-                       setSeed = mySeed)
-
-summary(samplesList[["samples"]][,c("beta0")]) #0.11[-0.14,0.35] reference site, blunt bill
-summary(samplesList[["samples"]][,c("beta1")]) #0.11[-0.14,0.35]
-summary(samplesList[["samples"]][,c("beta2")]) #0.08[-0.16,0.33]
-summary(samplesList[["samples"]][,c("beta3")]) #-0.24[-0.06,0.10]
-summary(samplesList[["samples"]][,c("beta4")]) #-0.07[-0.23,0.12]
-summary(samplesList[["samples"]][,c("beta5")]) #1.17[-0.03,0.36]
-summary(samplesList[["samples"]][,c("beta6")]) #1.17[-0.03,0.36]
-summary(samplesList[["samples"]][,c("beta7[1]")]) #1.17[-0.03,0.36]
-summary(samplesList[["samples"]][,c("beta7[2]")]) #1.17[-0.03,0.36]
-summary(samplesList[["samples"]][,c("beta7[3]")]) #1.17[-0.03,0.36]
-summary(samplesList[["samples"]][,c("beta8[2]")]) #1.17[-0.03,0.36] #temp ns
-summary(samplesList[["samples"]][,c("beta8[3]")]) #1.17[-0.03,0.36] #temp sig
-summary(samplesList[["samples"]][,c("beta9[2]")]) #1.17[-0.03,0.36] #prec ns
-summary(samplesList[["samples"]][,c("beta9[3]")]) #1.17[-0.03,0.36] #prec ns
-summary(samplesList[["samples"]][,c("beta10[3]")]) #1.17[-0.03,0.36] #cockle
-summary(samplesList[["samples"]][,c("beta11[3]")]) #1.17[-0.03,0.36] #mussel
-summary(samplesList[["samples"]][,c("beta12[3]")]) #1.17[-0.03,0.36] #grass
-summary(samplesList[["samples"]][,c("beta13[3]")]) #1.17[-0.03,0.36] #comp
-summary(samplesList[["samples"]][,c("beta71")]) #1.17[-0.03,0.36] #comp
-
-library(MCMCvis)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalEffectContBH_Age.png", width = 5000, height = 10000,units = 'px', res = 600)
-MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','beta5', 'beta6',
-                                        'beta7', 'beta8', 'beta9',
-                                        'beta10',
-                                        'beta11', 'beta12',
-                                        'beta13','beta14','beta15','beta16','beta17','beta18','beta19',
-                                        'beta20','beta21','beta22','beta23','beta24', 'beta25' 
-                                        ),
-         #labels = c("Intercept",
-        #   "Temperature", #expression('Temperature'^2), 
-          #          "Cockle abundance", #expression('Cockle availability'^2), 
-           #         "Mussel abundance", #expression('Mussel availability'^2), 
-            #        "Grassland proportion", #expression('Grassland proportion'^2)
-             #       "Conspecific density", "Intermediate feeder", "Worm specialist", "Temp int",
-          # "Temp worm", "Prec int", "Prec worm", "Cockle int", "Cockle worm", "Mussel int",
-          # "Mussel worm", "Grassland int", "Grassland worm", "Dens int", "Dens worm"),
-         main="Effect of environmental variables (standardized) \non condition")
-dev.off()
-
-samplesSummary <- round(samplesList$summary$all.chains[c("gamma1", "gamma2", "gamma3",
-                                                         "beta0", 
-                                                         "beta1", "beta2", 
-                                                         "beta3", 
-                                                         "beta4", "beta5",
-                                                         "beta6",
-                                                         "beta71",
-                                                         "beta7[2]", "beta7[3]",
-                                                         "beta8[2]", "beta8[3]",
-                                                         "beta9[2]", "beta9[3]",
-                                                         "beta10[2]", "beta10[3]",
-                                                         "beta11[2]", "beta11[3]",
-                                                         "beta12[2]", "beta12[3]",
-                                                         "beta13[2]", "beta13[3]",
-                                                         "sig4x", "sig5x",
-                                                         "sig7x","sig9x",
-                                                         "sig1x","sig2x","sig3x","mu.eps","sig.eps",
-                                                         "sig.r", "sig.temp" , "sig.prec"
-),1:5],2) #can also extract predicted.r for plotting
-
-### plot parameter estimates
-row.names(samplesSummary) = c("gamma1", "gamma2", "gamma3",
-                   "beta0", 
-                   "beta1", "beta2", 
-                   "beta3", 
-                   "beta4", "beta5",
-                   "beta6","beta71",
-                   "beta7[2]", "beta7[3]",
-                   "beta8[2]", "beta8[3]",
-                   "beta9[2]", "beta9[3]",
-                   "beta10[2]", "beta10[3]",
-                   "beta11[2]", "beta11[3]",
-                   "beta12[2]", "beta12[3]",
-                   "beta13[2]", "beta13[3]",
-                   "sig4x", "sig5x",
-                   "sig7x","sig9x",
-                   "sig1x","sig2x","sig3x","mu.eps","sig.eps",
-                   "sig.r", "sig.temp" , "sig.prec")
-
-d_plot<-data.frame(X = row.names(samplesSummary),samplesSummary)
-d_plot<-subset(d_plot,grepl("beta", d_plot$X))
-d_plot<-d_plot[2:22,] #mydata[1:5,]
-
-### plot difference between feeding specialists and condition
-d_plot1<-d_plot[7:9,] #mydata[1:5,]
-# order data
-d_plot1$X <- factor(d_plot1$X, levels = c("beta71", "beta7[2]", "beta7[3]"),
-                    labels=c("Shellfish specialist", "Intermediate feeder",
-                             "Worm specialist"))
-d_p1<-ggplot(data=d_plot1) +
-  geom_vline(xintercept=0, linetype="dashed", 
-             color = "grey", size=1.5)+
-  geom_point(aes(y=reorder(X, desc(X)),x=Median))+ #reorder(position, desc(position)
-  geom_errorbarh(data=d_plot1,mapping=aes(xmin=X95.CI_low, xmax=X95.CI_upp, y=X, x=Median),size=.8, height=.2)+
-  labs(x="Posterior median (+-95% CI)", y="")+
-  ggtitle("Effect of feeding specialization on \nconditon (standardized)")
-d_p1
-
-d_plot2a<-d_plot[1:6,] #mydata[1:5,]
-d_plot2b<-d_plot[10:21,] #mydata[1:5,]
-d_plot2<-rbind(d_plot2a,d_plot2b)
-
-# order data
-d_plot2$X <- factor(d_plot2$X, levels = c(
-                                        "beta1", "beta8[2]", "beta8[3]",
-                                        "beta2", "beta9[2]", "beta9[3]",
-                                        "beta3", "beta10[2]", "beta10[3]",
-                                        "beta4", "beta11[2]", "beta11[3]",
-                                        "beta5", "beta12[2]", "beta12[3]",
-                                        "beta6", "beta13[2]", "beta13[3]"),
-                    labels=c("Temperature Shellfish spec","Temperature Intermediate feeder","Temperature Worm spec", 
-                             "Precipitation Shellfish spec","Precipitation Intermediate feeder","Precipitation Worm spec",
-                             "Cockle avail Shellfish spec","Cockle avail Intermediate feeder","Cockle avail Worm spec",
-                             "Mussel avail Shellfish spec","Mussel avail Intermediate feeder","Mussel avail Worm spec",
-                             "Grassland Shellfish spec","Grassland Intermediate feeder","Grassland Worm spec",
-                             "Density Shellfish spec","Density Intermediate feeder","Density Worm spec"
-                             ))
-d_plot2$Specialization<-c("Shellfish", "Shellfish", "Shellfish",
-                          "Shellfish", "Shellfish", "Shellfish",
-                          "Intermediate", "Worm", 
-                          "Intermediate", "Worm",
-                          "Intermediate", "Worm",
-                          "Intermediate", "Worm",
-                          "Intermediate", "Worm",
-                          "Intermediate", "Worm"
-                          )
-d_plot2$Specialization<-factor(d_plot2$Specialization,
-                               levels=c("Worm","Intermediate","Shellfish"),
-                               labels =c("Worm","Intermediate","Shellfish"))
-str(d_plot2$Specialization)
-levels(d_plot2$Specialization)
-
-d_plot2$EnvVariable<-c("Temperature", "Precipitation", "Cockle availability",
-                          "Mussel availability", "Grassland proportion", "Conspecific density",
-                       "Temperature", "Temperature", 
-                          "Precipitation", "Precipitation",
-                          "Cockle availability", "Cockle availability",
-                          "Mussel availability", "Mussel availability",
-                          "Grassland proportion", "Grassland proportion",
-                          "Conspecific density", "Conspecific density")
-
-str(d_plot2$EnvVariable)
-d_plot2$EnvVariable<-factor(d_plot2$EnvVariable,
-                            levels=c("Temperature", "Precipitation", "Cockle availability",
-                                     "Mussel availability", "Grassland proportion","Conspecific density"),
-                            labels=c("Temperature", "Precipitation", "Cockle availability",
-                                     "Mussel availability", "Grassland proportion","Conspecific density"))
-
-library(ggplot2)
-d_p2<-ggplot(data=d_plot2) +
-  geom_vline(xintercept=0, linetype="dashed", 
-             color = "grey", size=1.5)+
-  geom_point(aes(y=reorder(Specialization, desc(Specialization)),x=Median))+ #reorder(position, desc(position)
-  geom_errorbarh(data=d_plot2,aes(xmin=X95.CI_low, xmax=X95.CI_upp, y=Specialization, x=Median), size=.8, height=.2)+
-  labs(x="Posterior median (+-95% CI)", y="")+
-  ggtitle("Effect of environmental variables (standardized) on condition")+
-  facet_wrap(~EnvVariable)
-d_p2
-
 ###################################################################################################
 ###################################################################################################
 #############################################################
 #### interaction bill shape (factor) 
-Cov<-read.csv(file="F:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Data/DataAnalysis/StateMatrix2000_2019Cond_3class_9Years_ID_ForEnv.csv")
+Cov<-read.csv(file="YOUR_PATH/Billshape.csv")
 str(Cov)
 hist(Cov$BH)
 table(Cov$BillShape)
@@ -1366,7 +877,7 @@ d_p1<-ggplot(data=d_plot1) +
         ))
 d_p1
 
-png("F:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/FeedingSpec.png", width = 3500, height = 3000,units = 'px', res = 600)
+png("YOUR_PATH/FeedingSpec.png", width = 3500, height = 3000,units = 'px', res = 600)
 d_p1
 dev.off()
 
@@ -1441,7 +952,7 @@ d_p2<-ggplot(data=d_plot2) +
               )
 d_p2
 
-png("F:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentFeedingSpec.png", width = 6000, height = 3500,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentFeedingSpec.png", width = 6000, height = 3500,units = 'px', res = 600)
 d_p2
 dev.off()
 
@@ -1450,7 +961,7 @@ d_p2
 d_p1
 library(patchwork)
 
-png("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Fig6_FeedingSpecOnCondition.png", width = 8500, height = 7500,units = 'px', res = 600)
+png("YOUR_PATH/Fig6_FeedingSpecOnCondition.png", width = 8500, height = 7500,units = 'px', res = 600)
 patchwork1<- (d_p1+plot_spacer())/d_p2 +
   #plot_annotation(tag_levels = 'a') +
   plot_layout(widths = c(1,3), heights =  c(1, 2)) 
@@ -1503,9 +1014,6 @@ round(mean(beta113<0),2) #Mussel avail worm feeder, 0.86
 round(mean(beta123>0),2) #Grassland worm feeder, 0.71
 round(mean(beta133>0),2) #Density worm feeder, 0.94
 
-save.image("F:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig5/GlobalEnvInteractionBillShape.Rdata")
-
-
 ############################################################################################################
 ############################################################################################################
 ############################################################################################################
@@ -1513,36 +1021,36 @@ save.image("F:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Anal
 library(basicMCMCplots)
 chainsPlot(samplesList$samples, #width=4000, height=6000,
            var = c("gamma1", "gamma2", "gamma3"),
-           file="P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot1.pdf")
+           file="YOUR_PATH/TracePlot1.pdf")
 chainsPlot(samplesList$samples, #width=4000, height=6000,
            var = c("beta0", "beta1", "beta2", "beta3", "beta4", "beta5", "beta6"),
-           file="P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot2.pdf")
+           file="YOUR_PATH/TracePlot2.pdf")
 chainsPlot(samplesList$samples, #width=4000, height=6000,
            var = c("beta7[2]", "beta7[3]", "beta8[2]", "beta8[3]", "beta9[2]", "beta9[3]"),
-           file="P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot2a.pdf")
+           file="YOUR_PATH/TracePlot2a.pdf")
 chainsPlot(samplesList$samples, #width=4000, height=6000,
            var = c("beta10[2]", "beta10[3]", "beta11[2]", "beta11[3]", "beta12[2]", "beta12[3]", "beta13[2]", "beta13[3]"),
-           file="P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot2b.pdf")
+           file="YOUR_PATH/TracePlot2b.pdf")
 #chainsPlot(samplesList$samples, #width=4000, height=6000,
 #           var = c("beta12", "beta22", "beta32", "beta42", "beta52"),
-#           file="P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/2Months/TracePlot3.pdf")
+#           file="YOUR_PATH/TracePlot3.pdf")
 chainsPlot(samplesList$samples, #width=4000, height=6000,
            var = c("sig1x","sig2x","sig3x","sig4x", "sig5x","sig7x", "sig9x"),
-           file="P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot4.pdf")
+           file="YOUR_PATH/TracePlot4.pdf")
 chainsPlot(samplesList$samples, #width=4000, height=6000,
            var = c("sig.r", "sig.temp", "sig.prec", "sig.eps", "mu.eps"),
-           file="P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot6.pdf")
+           file="YOUR_PATH/TracePlot6.pdf")
 chainsPlot(samplesList$samples, #width=4000, height=6000,
            var = c("eps[1]", "eps[2]", "eps[35]", "eps[36]"),
-           file="P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot7.pdf")
+           file="YOUR_PATH/TracePlot7.pdf")
 
 ## combine pdfs
 library(pdftools)
-pdf_combine(c("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot1.pdf","P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot2.pdf",
-              "P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot4.pdf",
-              "P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot5.pdf", "P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot6.pdf",
-              "P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot7.pdf"), 
-            output = "P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/TracePlot_joined.pdf")
+pdf_combine(c("YOUR_PATH/TracePlot1.pdf","YOUR_PATH/TracePlot2.pdf",
+              "PYOUR_PATH/TracePlot4.pdf",
+              "YOUR_PATH/TracePlot5.pdf", "YOUR_PATH/TracePlot6.pdf",
+              "YOUR_PATH/TracePlot7.pdf"), 
+            output = "YOUR_PATH/TracePlot_joined.pdf")
 
 #R-hat
 library(coda)
@@ -1557,14 +1065,14 @@ prhat = gelman.diag(samplesList$samples
 prhat$psrf[,1]
 GelRub<-as.data.frame(prhat$psrf[,1])
 names(GelRub)[1] <- "PSRF" #potential scale reduction factor 
-write.csv2(GelRub,"P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/GelRub.csv", 
+write.csv2(GelRub,"YOUR_PATH/GelRub.csv", 
            row.names =TRUE)
 
 ###### coefficient plots without chain
 library(MCMCvis)
 
 # main effects as caterpillar plot
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalEffectPlot1Months.png", width = 5000, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalEffectPlot1Months.png", width = 5000, height = 5000,units = 'px', res = 600)
 MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','beta5', 'beta6'),
          labels = c("Temperature", #expression('Temperature'^2), 
                     "Precipitation", #expression('Precipitation'^2), 
@@ -1577,7 +1085,7 @@ MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','bet
 dev.off() 
 
 # appendix sigmas
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalSigmas.png", width = 8500, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalSigmas.png", width = 8500, height = 5000,units = 'px', res = 600)
 MCMCplot(samplesList$samples, params =c( 'sig5x', 
                                         'sig7x', "sig9x", 
                                         'sig1x', 'sig2x','sig3x','sig4x',
@@ -1591,13 +1099,13 @@ MCMCplot(samplesList$samples, params =c( 'sig5x',
 dev.off()
 
 # appendix 
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalLatent.png", width = 8500, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalLatent.png", width = 8500, height = 5000,units = 'px', res = 600)
 MCMCplot(samplesList$samples, params =c('gamma1', 'gamma2', 'gamma3'),
          labels = c(expression(zeta[1]),expression(zeta[2]),expression(zeta[3])))
 dev.off()
 
 # appendix random effects
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalRandomEffect.png", width = 8500, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalRandomEffect.png", width = 8500, height = 5000,units = 'px', res = 600)
 MCMCplot(samplesList$samples, params =c('eps'),
          #  , 'eps[2]', 'eps[3]', 'eps[4]', 'eps[5]','eps[6]',"eps[7]","eps[8]", "eps[9]","eps[10]",
          #  'eps[11]', 'eps[12]', 'eps[13]', 'eps[14]', 'eps[15]','eps[16]',"eps[17]","eps[18]", "eps[19]","eps[20]",
@@ -1759,7 +1267,7 @@ head(dfT)
 library(png)
 library(grid)
 library(ggimage)
-imgTemp<-readPNG("P:/CHIRP/Carry-over/Analysis/Figures/Symbols for Figures/Temp.png")
+imgTemp<-readPNG("YOUR_PATH/Symbols for Figures/Temp.png")
 
 head(samplesSummaryTemp)
 
@@ -1861,7 +1369,7 @@ dfP <- data.frame(p = samplesSummaryPrec[,1][ord],
                   uciP = uciP[ord])
 head(dfP)
 
-imgPrec<-readPNG("P:/CHIRP/Carry-over/Analysis/Figures/Symbols for Figures/Prec.png")
+imgPrec<-readPNG("YOUR_PATH/Symbols for Figures/Prec.png")
 
 p_P<-ggplot(dfP, aes(x = p, y = cond)) + 
   geom_point(mapping=aes(x=samplesSummaryPrec[,1],y=samplesSummaryPredictedCond[,1],color=df$StateText,shape=df$YearShort),cex=2.5, alpha=0.5)+
@@ -1916,7 +1424,7 @@ dfC <- data.frame(c = contcov[,1][ord], #stcov for standardized
                   uciC = uciC[ord])
 head(dfC)
 
-imgCock<-readPNG("P:/CHIRP/Carry-over/Analysis/Figures/Symbols for Figures/Cockle.png")
+imgCock<-readPNG("YOUR_PATH/Symbols for Figures/Cockle.png")
 
 p_C<-ggplot(dfC, aes(x = c, y = cond)) + 
   geom_point(mapping=aes(x=contcov[,1],y=samplesSummaryPredictedCond[,1],color=df$StateText,shape=df$YearShort),cex=2.5, alpha=0.5)+ #stcov for standardized plot
@@ -1970,7 +1478,7 @@ dfM <- data.frame(m = contcov[,2][ord], #stcov for standardized
                   uciM = uciM[ord])
 head(dfM)
 
-imgMussel<-readPNG("P:/CHIRP/Carry-over/Analysis/Figures/Symbols for Figures/Mussel.png")
+imgMussel<-readPNG("YOUR_PATH/Symbols for Figures/Mussel.png")
 
 p_M<-ggplot(dfM, aes(x = m, y = cond)) + 
   geom_point(mapping=aes(x=contcov[,2],y=samplesSummaryPredictedCond[,1], color=df$StateText,shape=df$YearShort),cex=2.5, alpha=0.5)+
@@ -2026,7 +1534,7 @@ dfG <- data.frame(g = contcov[,3][ord], #stcov for standardized
                   uciG = uciG[ord])
 head(dfG)
 
-imgGras<-readPNG("P:/CHIRP/Carry-over/Analysis/Figures/Symbols for Figures/Earthworm.png")
+imgGras<-readPNG("YOUR_PATH/Symbols for Figures/Earthworm.png")
 
 p_G<-ggplot(dfG, aes(x = g, y = cond)) + 
   geom_point(mapping=aes(x=contcov[,3],y=samplesSummaryPredictedCond[,1],color=df$StateText,shape=df$YearShort),cex=2.5, alpha=0.5)+ #stcov for standardized
@@ -2082,7 +1590,7 @@ dfD <- data.frame(d = contcov[,4][ord], #stcov for standardized
                   uciD = uciD[ord])
 head(dfD)
 
-imgDens<-readPNG("P:/CHIRP/Carry-over/Analysis/Figures/Symbols for Figures/OYC_Density.png")
+imgDens<-readPNG("YOUR_PATH/Symbols for Figures/OYC_Density.png")
 
 p_D<-ggplot(dfD, aes(x = d, y = cond)) + 
   geom_point(mapping=aes(x=contcov[,4],y=samplesSummaryPredictedCond[,1],color=df$StateText,shape=df$YearShort),cex=2.5, alpha=0.5)+ #stcov for standardized
@@ -2116,7 +1624,7 @@ p_D
 
 ############# combine plots #############
 library(patchwork)
-png("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Fig5_EnvironmentalVariables.png", width = 9500, height = 4500,units = 'px', res = 600)
+png("YOUR_PATH/Fig5_EnvironmentalVariables.png", width = 9500, height = 4500,units = 'px', res = 600)
 layout = "
 ABCG
 DEFG
@@ -2126,12 +1634,10 @@ patchwork <- p_T+p_P+p_D+p_C+p_M+p_G+p_leg+ #(p_T|p_P|p_leg)/(p_C|p_M|p_G)+
 patchwork
 dev.off() 
 
-save.image("P:/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig5/GlobalEnvFig5.Rdata")
-
 #############################################################################################################################
-########################################### only adults (suppl) #################################################################################
+########################################### only adults (for supplements) #################################################################################
 ############################################################################################################################
-Cov<-read.csv(file="N:/Dep.AnE/AnE-share/_Magali/Nimble_M1_P12/StateMatrix2000_2019Cond_3class9Years.csv")
+Cov<-read.csv(file="YOUR_PATH/StateMatrix.csv")
 str(Cov)
 Cov<-Cov[,2]
 
@@ -2146,15 +1652,7 @@ dfAd<-join(Cov, df, by = "WaderID_ObsOcc", type = "left", match = "all")
 
 dfAd<-subset(dfAd, Age==4|Age==3) #n=1197
 
-
-#dfAd<-data.frame(dfAd[,1])
-#str(dfAd)
-#test <- dfAd %>% 
-#  dplyr::group_by(dfAd...1.) %>% 
-#  dplyr::count(dfAd...1.) ### 25 ind were caught twice!!! at different catch occasions (in first period)
-
 ################################################## NIMBLE CODE #################################
-#### try nimble approach with latent variable ###
 
 #response variable, = eta in cr-sem
 r_Ad<-dfAd[,12]
@@ -2394,7 +1892,7 @@ summary(samplesList[["samples"]][,c("beta5")]) #0.19[0.002,0.37]
 summary(samplesList[["samples"]][,c("beta6")]) #0.09[-0.07,0.27]
 
 library(MCMCvis)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalEffectAdults.png", width = 5000, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalEffectAdults.png", width = 5000, height = 5000,units = 'px', res = 600)
 MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','beta5', 'beta6'),
          labels = c("Temperature", #expression('Temperature'^2), 
                     "Precipitation", #expression('Precipitation'^2), 
@@ -2648,7 +2146,7 @@ summary(samplesList[["samples"]][,c("beta5")]) #0.43[0.03,0.81]
 summary(samplesList[["samples"]][,c("beta6")]) #0.21[-0.12,0.58]
 
 library(MCMCvis)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalEffectJuv.png", width = 5000, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalEffectJuv.png", width = 5000, height = 5000,units = 'px', res = 600)
 
 MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','beta5', 'beta6'),
          labels = c("Temperature", #expression('Temperature'^2), 
@@ -2664,7 +2162,7 @@ dev.off()
 #############################################################################################################################
 ########################################### different bill shapes ###########################################################
 ############################################################################################################################
-Cov<-read.csv(file="P:/CHIRP/Carry-over/Analysis/Data/DataAnalysis/StateMatrix2000_2019Cond_3class_9Years_ID_ForEnv.csv")
+Cov<-read.csv(file="YOUR_PATH/Billshape.csv")
 str(Cov)
 hist(Cov$BH)
 table(Cov$BillShape)
@@ -2682,36 +2180,6 @@ df_BillShape$BillShape<-factor(df_BillShape$BillShape)
 summary(df_BillShape$BillShape)
 #B   H  HB   P  PB  PH 
 #361  67  23 373 713  37 
-
-
-###verdeling leeftijdsklassen, snavelvorm ##
-#CovAge<-read.csv(file="N:/Dep.AnE/AnE-share/_Magali/Nimble_M1_P12/StateMatrix2000_2019Cond_3class9Years.csv")
-#str(CovAge)
-#CovAge$AgeF<-factor(CovAge$AgeN)
-
-#CovAgeF<-CovAge[,30]
-
-#summary(CovAgeF)
-#df_BillShape<-cbind(df_BillShape,CovAgeF)
-
-#summary(df_BillShape$BillShape)
-
-#table(df_BillShape$BillShape,df_BillShape$CovAgeF)
-
-#df_BillShapeT<-subset(df_BillShape,
-#                      select=c(BillShape,CovAgeF))
-#library(dplyr)
-#tableBillAge<-df_BillShapeT %>%
-#  group_by(BillShape,CovAgeF) %>%
-#  summarise(n = n())
-#tableBillAge
-#    1   2   3   4
-#B   56  41   1 263
-#H    3   1   1  62
-#HB   3   5   0  15
-#P   32  34   4 303
-#PB 126  68   9 510
-#PH   4   4   1  28
 
 #################################################################
 ############# worm specialists ##################################
@@ -2958,7 +2426,7 @@ round(mean(beta5>0),2) #0.98, grassland
 round(mean(beta6>0),2) #0.90, density
 
 library(MCMCvis)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalEffectWormSpec.png", width = 5000, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalEffectWormSpec.png", width = 5000, height = 5000,units = 'px', res = 600)
 MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','beta5', 'beta6'),
          labels = c("Temperature", #expression('Temperature'^2), 
                     "Precipitation", #expression('Precipitation'^2), 
@@ -2978,8 +2446,6 @@ summary(df_BillShape$BillShape)
 dfB<-subset(df_BillShape, BillShape=="B"|BillShape=="H"|BillShape=="HB") #n=451
 
 ################################################## NIMBLE CODE #################################
-#### try nimble approach with latent variable ###
-
 #response variable, = eta in cr-sem
 r_B<-dfB[,12]
 
@@ -3212,7 +2678,7 @@ summary(samplesList[["samples"]][,c("beta5")]) #0.2[-0.2,0.42]
 summary(samplesList[["samples"]][,c("beta6")]) #0.05[-0.17,0.28]
 
 library(MCMCvis)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalEffectShellfishSpec.png", width = 5000, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalEffectShellfishSpec.png", width = 5000, height = 5000,units = 'px', res = 600)
 MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','beta5', 'beta6'),
          labels = c("Temperature", #expression('Temperature'^2), 
                     "Precipitation", #expression('Precipitation'^2), 
@@ -3223,13 +2689,11 @@ MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','bet
          ),
          main="Effect of environmental variables (standardized) on \ncondition (of shellfish specialists)")
 dev.off()
+
 #######################################################
 #### generalist feeders ############################
-
 summary(df_BillShape$BillShape)
-
 dfI<-subset(df_BillShape, BillShape=="PB"|BillShape=="PH") #n=750
-
 ################################################## NIMBLE CODE #################################
 
 #response variable, = eta in cr-sem
@@ -3463,7 +2927,7 @@ summary(samplesList[["samples"]][,c("beta4")]) #-0.07[-0.23,0.12]
 summary(samplesList[["samples"]][,c("beta5")]) #1.17[-0.03,0.36]
 
 library(MCMCvis)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalEffectIntFeeder.png", width = 5000, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalEffectIntFeeder.png", width = 5000, height = 5000,units = 'px', res = 600)
 MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','beta5', 'beta6'),
          labels = c("Temperature", #expression('Temperature'^2), 
                     "Precipitation", #expression('Precipitation'^2), 
@@ -3474,6 +2938,7 @@ MCMCplot(samplesList$samples, params =c('beta1', 'beta2',  'beta3', 'beta4','bet
          ),
          main="Effect of environmental variables (standardized) on \ncondition (of generalist feeders)")
 dev.off()
+
 ########################################################################################################
 ############################## supplements ############################################################
 ########################################################################################################
@@ -3666,7 +3131,7 @@ p_D
 
 ############# combine plots #############
 library(patchwork)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalVariablesBothPeriods.png", width = 8500, height = 5000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalVariablesBothPeriods.png", width = 8500, height = 5000,units = 'px', res = 600)
 patchwork <- (p_T|p_P|p_D)/(p_C|p_M|p_G)
 patchwork<-patchwork +  plot_layout(guide='collect') & theme(legend.position = 'bottom')
 patchwork+plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 18))
@@ -3736,7 +3201,7 @@ p_M_Ss
 
 ############# combine plots #############
 library(patchwork)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Environment/EnvironmentalVariablesFoodSamples.png", width = 9000, height = 4000,units = 'px', res = 600)
+png("YOUR_PATH/EnvironmentalVariablesFoodSamples.png", width = 9000, height = 4000,units = 'px', res = 600)
 patchwork <- (p_C_Ss|p_M_Ss)
 patchwork<-patchwork +  plot_layout(guide='collect') & theme(legend.position = 'right')
 patchwork+plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 18))
