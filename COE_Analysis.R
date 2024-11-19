@@ -114,14 +114,13 @@ df<-join(R, Cond, by = "Code", type = "left", match = "all")
 
 
 ### add the manual calculated condition
-d<-read.csv("YOUR_PATH/CondManual.csv", header=T, dec=",", sep=";", fill=T)
 # BRP-YUC7 -0,002021724
-#BRB-B9YU 0,250990583
-#LG-W9RX 0,999224546
-#BLG-WJGP 0,772130804
-#RG-RPOK -0,480152116
-#RY-GKWC 1,545319109
-#BLR-W1R8 -0,386789467
+# BRB-B9YU 0,250990583
+# LG-W9RX 0,999224546
+# BLG-WJGP 0,772130804
+# RG-RPOK -0,480152116
+# RY-GKWC 1,545319109
+# BLR-W1R8 -0,386789467
 
 df$Mean[which(df$Code == "BRP-YUC7")] <- -0.002021724
 df$Mean[which(df$Code == "BRB-B9YU")] <- 0.250990583
