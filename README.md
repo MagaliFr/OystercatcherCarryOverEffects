@@ -12,6 +12,7 @@ Magali Frauendorf, Andrew M. Allen, Henk-Jan van der Kolk, Sarah Cubaynes, Bruno
 - ID.csv: individual information of the bird
 - COE_data.csv: carry-over effect dataset for the path analysis
 - EnviornmentalVariables.csv: environmental variables for the MSM-SEM
+- Billshape.csv: billshapes of individuals
 
 ## Codes for analyses
 - M1_9Years_Period12_nimble.R: multi-state mark recapture SEM
@@ -21,7 +22,7 @@ Magali Frauendorf, Andrew M. Allen, Henk-Jan van der Kolk, Sarah Cubaynes, Bruno
 
 ## Files and codes for figures
 - Figure3.R: seperate script to screate figure 3
-- symbols for figures: pngs used as images in the figures
+- Symbols for figures: pngs used as images in the figures
 
 ## Output
 - output20210805: output from the nimble model (mass is used as reference variable)
@@ -90,15 +91,24 @@ Global environments are archived on zenodo (10.5281/zenodo.14179442) because the
 - BH: Bill tip height (mm)
 - HT: handling time (proportion of 24 hours time)
 - DS: day in the season (1=1st November)
-- T1 – T40 indicate the 18 time steps of the multi-state model. Number 1-10 mean the following: 9 alive states: D, P, N, B, V, T, S, R, X (see Fig. 3.2 from PhD thesis and text for explanation), 10 means recovered dead.
+- T1 – T40 indicate the 18 time steps of the multi-state model. Number 1-10 mean the following: 9 alive states: D, P, N, B, V, T, S, R, X (see Figure 2 from the manuscript and text for explanation), 10 means recovered dead.
   
 ## ID.csv
 - ObsCatchNr: capture event
 - BirdId: ID of the bird
 - Code: colour ring code
   
-## TCatch
+## TCatch.csv
 - TCatch: time step that the individual was caught (in order to apply time variant condition variable in MSM-SEM)
+
+## Billshape.csv
+- WaderBirdID: BirdID from differnet system
+- ObsCatchNr.x: capture event
+- BirdId.x: ID of the bird (recent system)
+- FirstCode: previous code (for birds that changed code during lifetime, in case of worn rings for instance)
+- Code.x: Recent code
+- BillShape: bill shape as factor (P=point, PB=point blunt, PH=point chisel/hammer, HB=hammer/chisel blunt,  B=blunt, H=chisel/hammer; P are worm specialists, PB and PH are generalists, HB, H, B are shellfish specialists)
+- BH: billtipheight in mm
 
 Note that the ID.csv file can be cbind with the TCatch, StateMatrix and AgeMatrix file, meaning that they have the correct order.
 
