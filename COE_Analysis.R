@@ -937,7 +937,7 @@ con_14a<-mcmc_trace(nest_fit_brms, pars=c("phi_DNS2")) +#pars = c("wt", "sigma")
   labs(tag="n)", title="sigma nest survival", y="")
 
 library(patchwork)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/PathAnalysisConvergence/ConvergenceNestSucces.png", width = 9000, height = 12000,units = 'px', res = 800)
+png("YOUR_PATH/ConvergenceNestSucces.png", width = 9000, height = 12000,units = 'px', res = 800)
 (con_1a|con_8a)/(con_2a|con_9a)/(con_3a|con_10a)/(con_4a|con_11a)/(con_5a|con_12a)/(con_6a|con_13a)/(con_7a|con_14a)
 dev.off() 
 
@@ -959,7 +959,7 @@ NS_table
 knitr::kable(NS_table,digits=2, format="pandoc")
 kable_out_NS_table <- knitr::kable(NS_table, "html", digits=4) %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
 kable_out_NS_table
-readr::write_file(kable_out_NS_table, "P:/CHIRP/Carry-over/Analysis/Figures/Supplements/PathAnalysisConvergence/NS_table.doc")
+readr::write_file(kable_out_NS_table, "YOUR_PATH/NS_table.doc")
 
 
 ### dataframe with fitted values (points)
