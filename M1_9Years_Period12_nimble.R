@@ -3,12 +3,12 @@ library(nimble)
 library(igraph)
 library(coda)
 library(R6)
-setwd("P:/CHIRP/JAGS/JagsModels/M1_9Years_Period12")
+setwd("YOUR_PATH")
 
 # download and install RTools40: https://cran.r-project.org/bin/windows/Rtools/
 writeLines('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"', con = "~/.Renviron")
 
-d <- read.csv(file="StateMatrix2000_2019Cond_3class.csv")
+d <- read.csv(file="StateMatrix.csv")
 str(d)
 CH1<-d[,12:21] #period 1
 CH2<-d[,44:51] #period 2
@@ -86,7 +86,7 @@ names(stcov)
 # the condition dataset. Thus, even though they were not estimable in MARK we use a 0 for beta and sd prior of 0.1 (uninformative)
 
 # beta estimated in mark - or 0 if no prior info for certain age/state combinations 
-int.phi.meanprior <- matrix(c(0.7979485,1.1765438,3.9646808,   #state 1, age 1,2,3
+int.phi.meanprior <- matrix(c(0.7979485,1.1765438,3.9646808,          #state 1, age 1,2,3
                               0,0.873906,1.0615756,                   #state 2, age 1,2,3
                               -2.2365741, 0,0.9154164,                #state 3, age 1,2,3
                               0,0,2.2753403,                          #state 4, age 1,2,3
@@ -97,7 +97,7 @@ int.phi.meanprior <- matrix(c(0.7979485,1.1765438,3.9646808,   #state 1, age 1,2
                               1.9594179,0,1.8401387                   #state 9, age 1,2,3
 ), ncol=3,nrow=9)  
 # standard error: 0.001 if prior (precise), or 0.1 if no prior info (unprecise)
-int.phi.sdprior <- matrix(c(0.001,0.001,0.001,                 #state 1, age 1,2,3
+int.phi.sdprior <- matrix(c(0.001,0.001,0.001,                        #state 1, age 1,2,3
                             0.1,0.001,0.001,                          #state 2, age 1,2,3
                             0.001,0.1,0.001,                          #state 3, age 1,2,3
                             0.1,0.1,0.001,                            #state 4, age 1,2,3
@@ -109,7 +109,7 @@ int.phi.sdprior <- matrix(c(0.001,0.001,0.001,                 #state 1, age 1,2
 ), ncol=3,nrow=9)
 
 #same for resighting probability (p)
-int.p.meanprior <- matrix(c(0.4226055,0.9949699,0.5552625,     #state 1, age 1,2,3
+int.p.meanprior <- matrix(c(0.4226055,0.9949699,0.5552625,            #state 1, age 1,2,3
                             0,-2.2944491,0.1951106,                   #state 2, age 1,2,3
                             0,-4.2865546,0.3050049,                   #state 3, age 1,2,3
                             -1.2290286,-0.4012559,-1.6948417,         #state 4, age 1,2,3
@@ -120,7 +120,7 @@ int.p.meanprior <- matrix(c(0.4226055,0.9949699,0.5552625,     #state 1, age 1,2
                             0,0,-1.8367747                            #state 9, age 1,2,3 
 ), ncol=3,nrow=9)
 
-int.p.sdprior <- matrix(c(0.001,0.001,0.001,                   #state 1, age 1,2,3
+int.p.sdprior <- matrix(c(0.001,0.001,0.001,                          #state 1, age 1,2,3
                           0.001,0.001,0.001,                          #state 2, age 1,2,3
                           0.001,0.001,0.001,                          #state 3, age 1,2,3
                           0.001,0.001,0.001,                          #state 4, age 1,2,3
@@ -598,24 +598,14 @@ NimbleCode<-nimbleCode({
     
     ## Prior distributions of the precision parameters SEM
     sig1x ~ dunif(0,10)
-    #tau1x <- 1/(sig1x*sig1x)
     sig2x ~ dunif(0,10)
-    #tau2x <- 1/(sig2x*sig2x)
     sig3x ~ dunif(0,10)
-    #tau3x <- 1/(sig3x*sig3x)
     sig4x ~ dunif(0,10)
-    #tau4x <- 1/(sig4x*sig4x)
     sig5x ~ dunif(0,10)
-    #tau5x <- 1/(sig5x*sig5x)
     sig6x ~ dunif(0,10)
-    #tau6x <- 1/(sig6x*sig6x)
     sig7x ~ dunif(0,10)
-    #tau7x <- 1/(sig7x*sig7x)
     sig8x ~ dunif(0,10)
-    #tau8x <- 1/(sig8x*sig8x)
     sig9x ~ dunif(0,10)
-    #tau9x <- 1/(sig9x*sig9x)
-    #tau.eta1 <- 1000000000000       # fixing tau.eta1 (=precision) so that the error variance for composite variable is fixed to (close to) 0, precision=inverse variance
     
     # state-to-state movement probability
     for (s in 1:8){    
