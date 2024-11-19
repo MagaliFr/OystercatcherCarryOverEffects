@@ -1,9 +1,9 @@
 #libraries necessary
 library(ggplot2)
 library(patchwork)
-load("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig3/GlobalEnv.Rdata")
+load("YOUR_PATH/GlobalEnv.Rdata")
 
-setwd("G:/NIOO drive/N drive/_Magali/Nimble_M1_P12/Output20210805")
+setwd("YOUR_PATH/Output20210805")
 
 gamma2<-read.csv(file="gamma2.csv", header = T)
 head(gamma2[,2])
@@ -40,7 +40,7 @@ int_phi<-int_phi_p[28:54,]
 epst_phi<-read.csv(file="Output_CR_SEM_nimble_Surv_epst.phi.csv", header = T)
 head(epst_phi)
 
-setwd("F:/NIOO drive/N drive/_Magali/Nimble_M1_P12/Output20210808_hemaRef")
+setwd("YOUR_PATH/Output20210808_hemaRef")
 gamma1<-read.csv(file="gamma1.csv", header = T)
 head(gamma1[,2])
 gamma1<-gamma1[,2]
@@ -50,18 +50,8 @@ head(gamma3_HR[,2])
 gamma3_HR<-gamma3_HR[,2]
 head(gamma3_HR)
 
-#write.csv(gamma22,"Output/gamma22.csv", row.names =TRUE)
-#write.csv(gamma3,"Output/gamma3.csv", row.names =TRUE)
-#write.csv(gamma32,"Output/gamma32.csv", row.names =TRUE)
-#write.csv(mean.mat.stcov,"Output/mean.mat.stcov.csv", row.names =TRUE)
-#write.csv(stcov,"Output/stcov.csv", row.names =TRUE)
-#write.csv(beta1,"Output/beta1.csv", row.names =TRUE)
-#write.csv(beta2,"Output/beta2.csv", row.names =TRUE)
-
 ######################## Figure 3 #####################################################################
-#setwd("N:/Dep.AnE/AnE-share/_Magali/Nimble_M1_P12/Output20210805")
-setwd("G:/NIOO drive/N drive/_Magali/Nimble_M1_P12/Output20210805")
-
+setwd("YOUR_PATH/Output20210805")
 
 # predict linear effect of mass on condition
 predicted_conditionMS <- matrix(NA, nrow = length(gamma2), ncol = length(mean.mat.stcov[,1]))
@@ -243,8 +233,8 @@ Phi$Year<-ifelse(Phi$YearDigit==" 1]", "W 1999-2000 to S 2000", #means winter 19
 
 
 
-cov<-read.csv(file="F:/NIOO drive/N drive/_Magali/Nimble_M1_P12/StateMatrix2000_2019Cond_3class9Years.csv")
-ID<-read.csv(file="F:/NIOO drive/N drive/_Magali/Nimble_M1_P12/StateMatrix2000_2019Cond_3class_9Years_ID.csv")
+cov<-read.csv(file="YOUR_PATH/StateMatrix.csv")
+ID<-read.csv(file="YOUR_PATH/ID.csv")
 
 
 ## add year and state (catching loc) for each individual (based on obscatchNr)
@@ -678,7 +668,7 @@ summary(Cond_Surv_Ad$MeanCond)
 
 #### combine plots for supplements
 library(patchwork)
-png("P:/CHIRP/Carry-over/Analysis/Figures/Supplements/Survival_Condition_Fig3/Surv_Cond_perAgeClass.png", width = 13000, height = 6000,units = 'px', res = 800)
+png("YOUR_PATH/Surv_Cond_perAgeClass.png", width = 13000, height = 6000,units = 'px', res = 800)
 patchwork <- p_4_Ad|p_4_SAd|p_4_Juv+
   xlab(label = "body condition")+
   theme(axis.title.x = element_text(vjust=1.9, hjust=-1.2))
@@ -721,7 +711,7 @@ p_4_test
 ############################################# caterpillar plots for confounding variables ######################
 ################################################################################################################
 ## alternativly manually like this; see l=plottingputput p12
-PathCoef<-read.csv(file="F:/NIOO drive/N drive/_Magali/Nimble_M1_P12/Output20210805/Output_CR_SEM_nimble_PathCoef.csv")
+PathCoef<-read.csv(file="YOUR_PATH/Output20210805/Output_CR_SEM_nimble_PathCoef.csv")
 
 ### plot sem parameters
 #confounding variables on mass
@@ -822,9 +812,7 @@ library(ggplot2)
 library(patchwork)
 #install.packages("scales")
 library(scales)
-#png("P:/CHIRP/Carry-over/Analysis/Figures/MainDoc/Fig3_ConditionVariables.png", width = 14000, height = 9000,units = 'px', res = 800)
-#png("P:/CHIRP/Presentaties/AnE seminar/Fig3_ConditionVariables.png", width = 14000, height = 9000,units = 'px', res = 800)
-png("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Fig3_ConditionVariables.png", width = 14000, height = 9000,units = 'px', res = 800)
+png("YOUR_PATH/Fig3_ConditionVariables.png", width = 14000, height = 9000,units = 'px', res = 800)
 
 layout <- "
 AADDGGGG
@@ -835,8 +823,6 @@ patchwork <- CM+CH+CB+p_1+p_2+p_3+p_4 +
   plot_layout(design = layout)
 patchwork+plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 18))
 dev.off() 
-
-save.image("G:/NIOO drive/P drive/Personal Drive (MagaliF)/CHIRP/Carry-over/Analysis/Figures/MainDoc/Files for Fig3/GlobalEnv.Rdata")
 
 ############################################################################################################################
 ####################################### distribution of mass across periods ##################################################
@@ -1202,7 +1188,7 @@ R2_table
 
 knitr::kable(R2_table,digits=2, format="pandoc")
 kable_out_R2_table <- knitr::kable(R2_table, "html", digits=4) %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
-readr::write_file(kable_out_R2_table, "P:/CHIRP/Carry-over/Analysis/Figures/Supplements/R2/R2_table.doc")
+readr::write_file(kable_out_R2_table, "YOUR_PATH/R2_table.doc")
 
 ######################################### bayesian r2 per year ##############################################
 # W 2000-2001 to S 2001 " 3]"
@@ -1585,7 +1571,7 @@ R2_table
 
 knitr::kable(R2_table,digits=2, format="pandoc")
 kable_out_R2_table <- knitr::kable(R2_table, "html", digits=4) %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
-readr::write_file(kable_out_R2_table, "P:/CHIRP/Carry-over/Analysis/Figures/Supplements/R2/R2_table.doc")
+readr::write_file(kable_out_R2_table, "YOUR_PATH/R2_table.doc")
 
 #####################################################################################################
 ######### calculate bayesian r2 EXAMPLE #############################################################
